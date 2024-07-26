@@ -80,23 +80,33 @@
     ]
   },
   {
-    "objectID": "reintro_a_r.html#recursos-adicionales",
-    "href": "reintro_a_r.html#recursos-adicionales",
-    "title": "1  (Re)introducción a R para Biología y Bioinformática",
-    "section": "1.8 Recursos Adicionales",
-    "text": "1.8 Recursos Adicionales\nAquí hay algunos recursos para ayudarte a seguir aprendiendo R y bioinformática: - Documentación de R - Bioconductor - Hojas de Referencia de RStudio",
+    "objectID": "hpo_redes1.html",
+    "href": "hpo_redes1.html",
+    "title": "2  Redes 1: HPO y STRINGdb",
+    "section": "",
+    "text": "Text and code to get genes from HPO and use them to create networks.",
     "crumbs": [
-      "<span class='chapter-number'>1</span>  <span class='chapter-title'>(Re)introducción a R para Biología y Bioinformática</span>"
+      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Redes 1: HPO y STRINGdb</span>"
     ]
   },
   {
-    "objectID": "summary.html",
-    "href": "summary.html",
-    "title": "2  Summary",
+    "objectID": "hpo_redes2.html",
+    "href": "hpo_redes2.html",
+    "title": "3  Redes 2: Clusterizacion y Enriquecimiento Funcional",
     "section": "",
-    "text": "In summary, this book has no content whatsoever.",
+    "text": "Text and code to cluster the network and perform functional enrichment.",
     "crumbs": [
-      "<span class='chapter-number'>2</span>  <span class='chapter-title'>Summary</span>"
+      "<span class='chapter-number'>3</span>  <span class='chapter-title'>Redes 2: Clusterizacion y Enriquecimiento Funcional</span>"
+    ]
+  },
+  {
+    "objectID": "references.html",
+    "href": "references.html",
+    "title": "Recursos Adicionales",
+    "section": "",
+    "text": "Aquí hay algunos recursos para ayudarte a seguir aprendiendo R y bioinformática: - Documentación de R - Bioconductor - Hojas de Referencia de RStudio",
+    "crumbs": [
+      "Recursos Adicionales"
     ]
   }
 ]

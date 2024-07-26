@@ -1,0 +1,3 @@
+# Redes 1: HPO y STRINGdb
+
+Text and code to get genes from HPO and use them to create networks.
