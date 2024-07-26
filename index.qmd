@@ -1,0 +1,3 @@
+# Preface {.unnumbered}
+
+Este material está diseñado para acompañar las sesiones prácticas de la asignatura "Biología Molecular de Sistemas", que forma parte del grado de Bioquímica en la Universidad de Málaga. Se divide en 3 partes: una reintroducción a R, que estudiarás en un seminario de una hora, y 2 partes más extensas, donde utilizarás R para construir y analizar redes biológicas.
