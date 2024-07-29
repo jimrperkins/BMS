@@ -1,0 +1,6 @@
+Gene,Condition1,Condition2
+GeneA,5.2,4.8
+GeneB,3.8,3.2
+GeneC,4.5,5.0
+GeneD,6.0,6.5
+GeneE,2.9,3.1
