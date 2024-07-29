@@ -198,9 +198,9 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#gráfico-de-dispersión" id="toc-gráfico-de-dispersión" class="nav-link" data-scroll-target="#gráfico-de-dispersión"><span class="header-section-number">1.5.1</span> Gráfico de Dispersión</a></li>
   <li><a href="#histograma" id="toc-histograma" class="nav-link" data-scroll-target="#histograma"><span class="header-section-number">1.5.2</span> Histograma</a></li>
   </ul></li>
-  <li><a href="#introducción-al-análisis-de-redes-con-igraph" id="toc-introducción-al-análisis-de-redes-con-igraph" class="nav-link" data-scroll-target="#introducción-al-análisis-de-redes-con-igraph"><span class="header-section-number">1.6</span> Introducción al Análisis de Redes con <code>igraph</code></a>
+  <li><a href="#lectura-de-archivos" id="toc-lectura-de-archivos" class="nav-link" data-scroll-target="#lectura-de-archivos"><span class="header-section-number">1.6</span> Lectura de Archivos</a>
   <ul class="collapse">
-  <li><a href="#instalación-y-carga-de-igraph" id="toc-instalación-y-carga-de-igraph" class="nav-link" data-scroll-target="#instalación-y-carga-de-igraph"><span class="header-section-number">1.6.1</span> Instalación y Carga de <code>igraph</code></a></li>
+  <li><a href="#lectura-de-un-archivo-csv" id="toc-lectura-de-un-archivo-csv" class="nav-link" data-scroll-target="#lectura-de-un-archivo-csv"><span class="header-section-number">1.6.1</span> Lectura de un Archivo CSV</a></li>
   <li><a href="#creación-de-una-red-simple" id="toc-creación-de-una-red-simple" class="nav-link" data-scroll-target="#creación-de-una-red-simple"><span class="header-section-number">1.6.2</span> Creación de una Red Simple</a></li>
   <li><a href="#análisis-de-la-red" id="toc-análisis-de-la-red" class="nav-link" data-scroll-target="#análisis-de-la-red"><span class="header-section-number">1.6.3</span> Análisis de la Red</a></li>
   </ul></li>
@@ -407,19 +407,59 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 </section>
-<section id="introducción-al-análisis-de-redes-con-igraph" class="level2" data-number="1.6">
-<h2 data-number="1.6" class="anchored" data-anchor-id="introducción-al-análisis-de-redes-con-igraph"><span class="header-section-number">1.6</span> Introducción al Análisis de Redes con <code>igraph</code></h2>
-<p>El análisis de redes es un aspecto crucial de la bioinformática, especialmente en la comprensión de vías e interacciones biológicas. El paquete <code>igraph</code> en R es una herramienta poderosa para crear y analizar grafos.</p>
-<section id="instalación-y-carga-de-igraph" class="level3" data-number="1.6.1">
-<h3 data-number="1.6.1" class="anchored" data-anchor-id="instalación-y-carga-de-igraph"><span class="header-section-number">1.6.1</span> Instalación y Carga de <code>igraph</code></h3>
-<p>Primero, necesitas cargar el paquete <code>igraph</code>.</p>
-<p>¿Qué es un Paquete en R? En R, un paquete es una colección de funciones, datos y código que extienden las capacidades básicas del lenguaje. Los paquetes son creados por la comunidad de R y están diseñados para abordar tareas específicas, desde análisis estadísticos avanzados hasta visualización de datos y manejo de datos biológicos. Los paquetes facilitan el trabajo con R al proporcionar herramientas adicionales que puedes usar en tus scripts y análisis.</p>
-<p>Instalación y Carga de Paquetes Para utilizar un paquete en R, primero necesitas instalarlo (si no está ya instalado) y luego cargarlo en tu sesión de R.</p>
-<p>Instalación de Paquetes Puedes instalar un paquete desde CRAN (Comprehensive R Archive Network) utilizando la función install.packages():</p>
-<p>Ahora vamos a cargar un paquee que ya esta instalado, usando el comando library()</p>
+<section id="lectura-de-archivos" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="lectura-de-archivos"><span class="header-section-number">1.6</span> Lectura de Archivos</h2>
+<p>En bioinformática, es común trabajar con datos almacenados en archivos. R proporciona funciones para leer varios tipos de archivos, incluyendo archivos de texto, CSV y Excel.</p>
+<section id="lectura-de-un-archivo-csv" class="level3" data-number="1.6.1">
+<h3 data-number="1.6.1" class="anchored" data-anchor-id="lectura-de-un-archivo-csv"><span class="header-section-number">1.6.1</span> Lectura de un Archivo CSV</h3>
+<p>Vamos a leer un archivo CSV con información de expresión génica en diferentes condiciones experimentales. Primero, crearemos un archivo CSV simple.</p>
+<section id="creación-de-un-archivo-csv" class="level4" data-number="1.6.1.1">
+<h4 data-number="1.6.1.1" class="anchored" data-anchor-id="creación-de-un-archivo-csv"><span class="header-section-number">1.6.1.1</span> Creación de un Archivo CSV</h4>
+<p>Guarda el siguiente contenido en un archivo llamado <code>gene_expression.csv</code>:</p>
+<pre class="plaintext"><code>Gene,Condition1,Condition2
+GeneA,5.2,4.8
+GeneB,3.8,3.2
+GeneC,4.5,5.0
+GeneD,6.0,6.5
+GeneE,2.9,3.1</code></pre>
+</section>
+<section id="lectura-del-archivo-csv" class="level4" data-number="1.6.1.2">
+<h4 data-number="1.6.1.2" class="anchored" data-anchor-id="lectura-del-archivo-csv"><span class="header-section-number">1.6.1.2</span> Lectura del Archivo CSV</h4>
+<p>Utiliza la función <code>read.csv()</code> para leer el archivo CSV en un data frame.</p>
+<p>Primero hay que descargar el fichero <a href="https://raw.githubusercontent.com/jimrperkins/BMS/main/files/gene_expression.csv">gene_expression.csv</a></p>
+<p>Abre el fichero - ¿entiendes lo que representa a simple vista?</p>
+<p>Para abrirlo, es necesario especificar en qué carpeta está el fichero o moverlo a la carpeta donde estás ejecutando el código. En el siguiente código, suponemos que el fichero está en la carpeta donde estás ejecutando el código.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Cargar paquete igraph</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Leer el archivo CSV</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>gene_file <span class="ot">&lt;-</span> <span class="st">"gene_expression.csv"</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>gene_data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(gene_file)</span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostrar el contenido del data frame</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(gene_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<pre><code>
+
+## Introducción al Análisis de Redes con `igraph`
+
+El análisis de redes es un aspecto crucial de la bioinformática, especialmente en la comprensión de vías e interacciones biológicas. El paquete `igraph` en R es una herramienta poderosa para crear y analizar grafos.
+
+### Instalación y Carga de `igraph`
+
+Primero, necesitas cargar el paquete `igraph`.
+
+¿Qué es un Paquete en R? En R, un paquete es una colección de funciones, datos y código que extienden las capacidades básicas del lenguaje. Los paquetes son creados por la comunidad de R y están diseñados para abordar tareas específicas, desde análisis estadísticos avanzados hasta visualización de datos y manejo de datos biológicos. Los paquetes facilitan el trabajo con R al proporcionar herramientas adicionales que puedes usar en tus scripts y análisis.
+
+Instalación y Carga de Paquetes Para utilizar un paquete en R, primero necesitas instalarlo (si no está ya instalado) y luego cargarlo en tu sesión de R.
+
+Instalación de Paquetes Puedes instalar un paquete desde CRAN (Comprehensive R Archive Network) utilizando la función install.packages():
+
+Ahora vamos a cargar un paquee que ya esta instalado, usando el comando library()
+
+::: {.cell}
+
+```{.r .cell-code}
+# Cargar paquete igraph
+library(igraph)</code></pre>
 <div class="cell-output cell-output-stderr">
 <pre><code>
 Attaching package: 'igraph'</code></pre>
@@ -434,7 +474,8 @@ Attaching package: 'igraph'</code></pre>
 
     union</code></pre>
 </div>
-</div>
+<p>:::</p>
+</section>
 </section>
 <section id="creación-de-una-red-simple" class="level3" data-number="1.6.2">
 <h3 data-number="1.6.2" class="anchored" data-anchor-id="creación-de-una-red-simple"><span class="header-section-number">1.6.2</span> Creación de una Red Simple</h3>
@@ -446,23 +487,23 @@ Attaching package: 'igraph'</code></pre>
 </ol>
 <p>Vamos a crear una red simple de interacciones proteína-proteína.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definir aristas (interacciones) entre proteínas</span></span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>edges <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ProteinA"</span>, <span class="st">"ProteinB"</span>,</span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>           <span class="st">"ProteinA"</span>, <span class="st">"ProteinC"</span>,</span>
-<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>           <span class="st">"ProteinB"</span>, <span class="st">"ProteinC"</span>,</span>
-<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>           <span class="st">"ProteinB"</span>, <span class="st">"ProteinD"</span>,</span>
-<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>           <span class="st">"ProteinB"</span>, <span class="st">"ProteinE"</span>,</span>
-<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>           <span class="st">"ProteinC"</span>, <span class="st">"ProteinE"</span>)</span>
-<span id="cb33-8"><a href="#cb33-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-9"><a href="#cb33-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear un objeto de grafo</span></span>
-<span id="cb33-10"><a href="#cb33-10" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph</span>(edges, <span class="at">directed=</span><span class="cn">FALSE</span>)</span>
-<span id="cb33-11"><a href="#cb33-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb33-12"><a href="#cb33-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Graficar el grafo</span></span>
-<span id="cb33-13"><a href="#cb33-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.label=</span><span class="fu">V</span>(g)<span class="sc">$</span>name, <span class="at">main=</span><span class="st">"Red de Interacción Proteína-Proteína"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Definir aristas (interacciones) entre proteínas</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>edges <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ProteinA"</span>, <span class="st">"ProteinB"</span>,</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>           <span class="st">"ProteinA"</span>, <span class="st">"ProteinC"</span>,</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>           <span class="st">"ProteinB"</span>, <span class="st">"ProteinC"</span>,</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>           <span class="st">"ProteinB"</span>, <span class="st">"ProteinD"</span>,</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>           <span class="st">"ProteinB"</span>, <span class="st">"ProteinE"</span>,</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>           <span class="st">"ProteinC"</span>, <span class="st">"ProteinE"</span>)</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Crear un objeto de grafo</span></span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph</span>(edges, <span class="at">directed=</span><span class="cn">FALSE</span>)</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Graficar el grafo</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.label=</span><span class="fu">V</span>(g)<span class="sc">$</span>name, <span class="at">main=</span><span class="st">"Red de Interacción Proteína-Proteína"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="reintro_a_r_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="reintro_a_r_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -472,18 +513,18 @@ Attaching package: 'igraph'</code></pre>
 <h3 data-number="1.6.3" class="anchored" data-anchor-id="análisis-de-la-red"><span class="header-section-number">1.6.3</span> Análisis de la Red</h3>
 <p>Puedes realizar varios análisis en la red, como encontrar el grado de cada nodo.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular el grado de cada nodo</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">degree</span>(g)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calcular el grado de cada nodo</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">degree</span>(g)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>ProteinA ProteinB ProteinC ProteinD ProteinE 
        2        4        3        1        2 </code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Graficar el grafo con tamaños de nodo proporcionales a su grado</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.size=</span><span class="fu">degree</span>(g)<span class="sc">*</span><span class="dv">10</span>, <span class="at">vertex.label=</span><span class="fu">V</span>(g)<span class="sc">$</span>name, <span class="at">main=</span><span class="st">"Red de Interacción Proteína-Proteína (Tamaño del Nodo ~ Grado)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Graficar el grafo con tamaños de nodo proporcionales a su grado</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.size=</span><span class="fu">degree</span>(g)<span class="sc">*</span><span class="dv">10</span>, <span class="at">vertex.label=</span><span class="fu">V</span>(g)<span class="sc">$</span>name, <span class="at">main=</span><span class="st">"Red de Interacción Proteína-Proteína (Tamaño del Nodo ~ Grado)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="reintro_a_r_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="reintro_a_r_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
