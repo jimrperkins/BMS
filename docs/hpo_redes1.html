@@ -243,58 +243,203 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="obtaining-a-list-of-genes-associated-with-an-hpo-term." class="level2" data-number="2.3">
 <h2 data-number="2.3" class="anchored" data-anchor-id="obtaining-a-list-of-genes-associated-with-an-hpo-term."><span class="header-section-number">2.3</span> Obtaining a list of genes associated with an HPO term.</h2>
-<p>For the purpose of this practical, we are going to use the HPO term XXX.</p>
+<p>For the purpose of this practical, we are going to use the HPO term HP:0002451, and obtain the genes that are associated with this phenotype.</p>
+<p>This can be done via the website, as we saw in the previous practical, or programmatically</p>
 <section id="from-the-hpo-website" class="level3" data-number="2.3.1">
 <h3 data-number="2.3.1" class="anchored" data-anchor-id="from-the-hpo-website"><span class="header-section-number">2.3.1</span> From the HPO website</h3>
-<p>The first step is to obtain the list of genes.</p>
+<p>The first step is to obtain the list of genes from https://hpo.jax.org/ , by searching for the HPO term HP:0002451.</p>
+<p>You already saw how to obtain the list of genes for this term in a previous practical, so we won’t go through this again. But you should end up with a file with multiple rows (one per gene), and 2 columns, for which the first column represents the gene ids (corresponding to the ENTREZ database ids) and the second the gene names (or symbols, according to the HGNC).</p>
+<p>Which of the two ways of referring to genes is more informative?</p>
+<p>You could perform this task manually for your HPO, and get the list of genes as a file, which you could then load into R with read.table or read.csv. However, it is also possible to get the genes directly, via the R package HPO.db</p>
 </section>
 <section id="programatically." class="level3" data-number="2.3.2">
 <h3 data-number="2.3.2" class="anchored" data-anchor-id="programatically."><span class="header-section-number">2.3.2</span> Programatically.</h3>
+<p>You can also obtain the list of genes using the R package HPO.db following these instructions:</p>
+<section id="installation-and-loading-of-necessary-packages" class="level4" data-number="2.3.2.1">
+<h4 data-number="2.3.2.1" class="anchored" data-anchor-id="installation-and-loading-of-necessary-packages"><span class="header-section-number">2.3.2.1</span> Installation and Loading of Necessary Packages</h4>
+<p>First, install and load the required R packages. HPO.db is for the HPO data, AnnotationDbi and org.Hs.eg.db are for translating ids (e.g.&nbsp;from ENTREZ ids to gene names or gene symbols).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">"BiocManager"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">install.packages</span>(<span class="st">"BiocManager"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"HPO.db"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Bioconductor version 3.19 (BiocManager 1.30.23), R 4.4.1 (2024-06-14)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package(s) not installed when version(s) same as or greater than current; use
+  `force = TRUE` to re-install: 'HPO.db'</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"AnnotationDbi"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Bioconductor version 3.19 (BiocManager 1.30.23), R 4.4.1 (2024-06-14)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package(s) not installed when version(s) same as or greater than current; use
+  `force = TRUE` to re-install: 'AnnotationDbi'</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"org.Hs.eg.db"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Bioconductor version 3.19 (BiocManager 1.30.23), R 4.4.1 (2024-06-14)</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package(s) not installed when version(s) same as or greater than current; use
+  `force = TRUE` to re-install: 'org.Hs.eg.db'</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(HPO.db)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>HPO.db version 0.99.2</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(AnnotationDbi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Cargando paquete requerido: stats4</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Cargando paquete requerido: BiocGenerics</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Adjuntando el paquete: 'BiocGenerics'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    IQR, mad, sd, var, xtabs</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    Filter, Find, Map, Position, Reduce, anyDuplicated, aperm, append,
+    as.data.frame, basename, cbind, colnames, dirname, do.call,
+    duplicated, eval, evalq, get, grep, grepl, intersect, is.unsorted,
+    lapply, mapply, match, mget, order, paste, pmax, pmax.int, pmin,
+    pmin.int, rank, rbind, rownames, sapply, setdiff, table, tapply,
+    union, unique, unsplit, which.max, which.min</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Cargando paquete requerido: Biobase</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Welcome to Bioconductor
+
+    Vignettes contain introductory material; view with
+    'browseVignettes()'. To cite Bioconductor, see
+    'citation("Biobase")', and for packages 'citation("pkgname")'.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Cargando paquete requerido: IRanges</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Cargando paquete requerido: S4Vectors</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Adjuntando el paquete: 'S4Vectors'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:utils':
+
+    findMatches</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    I, expand.grid, unname</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(org.Hs.eg.db)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code></code></pre>
+</div>
+</div>
+</section>
+<section id="obtaining-genes-for-a-specific-hpo-term" class="level4" data-number="2.3.2.2">
+<h4 data-number="2.3.2.2" class="anchored" data-anchor-id="obtaining-genes-for-a-specific-hpo-term"><span class="header-section-number">2.3.2.2</span> Obtaining Genes for a Specific HPO Term</h4>
+<p>Define the HPO term ID and obtain the associated genes.</p>
+<p>We can compare these ids to the first column of the file we downloaded from the HPO website. However, it is also useful to see the gene names (or gene symbols as they are normally referred to as).</p>
+</section>
+<section id="mapping-entrez-gene-ids-to-gene-symbols" class="level4" data-number="2.3.2.3">
+<h4 data-number="2.3.2.3" class="anchored" data-anchor-id="mapping-entrez-gene-ids-to-gene-symbols"><span class="header-section-number">2.3.2.3</span> Mapping Entrez Gene IDs to Gene Symbols</h4>
+<p>Convert the Entrez Gene IDs to gene symbols.</p>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>'select()' returned 1:1 mapping between keys and columns</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>        16        478        540       1282       1293       2619       2639 
+   "AARS1"   "ATP1A3"    "ATP7B"   "COL4A1"   "COL6A3"     "GAS1"     "GCDH" 
+      2643       2736       3208       3615       4137       5610       5727 
+    "GCH1"     "GLI2"     "HPCA"   "IMPDH2"     "MAPT"  "EIF2AK2"    "PTCH1" 
+      6531       6571       6997       7050       7054       8243       8928 
+  "SLC6A3"  "SLC18A2"   "CRIPTO"    "TGIF1"       "TH"    "SMC1A"    "FOXH1" 
+      9997      10735      10939      26580      28514      54832      55823 
+    "SCO2"    "STAG2"   "AFG3L2"    "BSCL2"     "DLL1"   "VPS13C"    "VPS11" 
+     63982      80025      84504      84976      87178      90522     150468 
+    "ANO3"    "PANK2"   "NKX6-2"    "DISP1"    "PNPT1"    "YIF1B"   "CKAP2L" 
+      2774      51102      23516      58494       4929      55145       9256 
+    "GNAL"     "MECR" "SLC39A14"     "JAM2"    "NR4A2"    "THAP1"  "TSPOAP1" 
+      1528       1727       6872     170302       1841       2782     128486 
+   "CYB5A"   "CYB5R3"     "TAF1"      "ARX"    "DTYMK"     "GNB1"    "FITM2" 
+      1644     137492       8575     116228       2260       2253       6496 
+     "DDC"   "VPS37A"    "PRKRA"    "COX20"    "FGFR1"     "FGF8"     "SIX3" 
+      4838       6469       7546       6491      50937      10352      23230 
+   "NODAL"      "SHH"     "ZIC2"     "STIL"     "CDON"    "WARS2"   "VPS13A" 
+     23007      10382         60      11315       9757       2512      64601 
+   "PLCH1"   "TUBB4A"     "ACTB"    "PARK7"    "KMT2B"      "FTL"    "VPS16" 
+     84340      84909      57679       2521      80208      10280      10558 
+    "GFM2"    "AOPEP"     "ALS2"      "FUS"    "SPG11"  "SIGMAR1"   "SPTLC1" 
+      1737      23345 
+    "DLAT"    "SYNE1" </code></pre>
+</div>
+</div>
+<p>These should be the same as - or very similar - to the second column in the file downloaded from the HPO website.</p>
+</section>
 </section>
 </section>
 <section id="querying-stringdb-with-a-list-of-genes" class="level2" data-number="2.4">
 <h2 data-number="2.4" class="anchored" data-anchor-id="querying-stringdb-with-a-list-of-genes"><span class="header-section-number">2.4</span> Querying STRINGdb with a list of genes</h2>
+<p>Now that we have our list of genes associated with a pathological phenotype, we want to use them to query STRINGdb to see whether any of the genes in our list interact with other genes in our list. We can then use this interaction data to build a network.</p>
 <p>To query STRINGdb with a list of genes and then convert the results into an igraph object for visualization and analysis, follow these steps:</p>
 <section id="step-1-query-stringdb-with-a-list-of-genes" class="level3" data-number="2.4.1">
 <h3 data-number="2.4.1" class="anchored" data-anchor-id="step-1-query-stringdb-with-a-list-of-genes"><span class="header-section-number">2.4.1</span> Step 1: Query STRINGdb with a List of Genes</h3>
 <ol type="1">
 <li><p><strong>Install Required Packages</strong>: Ensure you have the necessary R packages installed: <code>STRINGdb</code>, <code>igraph</code>, and <code>ggplot2</code> for visualization.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"STRINGdb"</span>)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"igraph"</span>)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"ggplot2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"STRINGdb"</span>)</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"igraph"</span>)</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"ggplot2"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p><strong>Load Required Libraries</strong>:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(STRINGdb)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(STRINGdb)</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p><strong>Initialize STRINGdb</strong>: Create an instance of the STRINGdb object. The version of STRINGdb may vary; ensure you use the appropriate one for your needs.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>string_db <span class="ot">&lt;-</span> STRINGdb<span class="sc">$</span><span class="fu">new</span>(<span class="at">version =</span> <span class="st">"11.5"</span>, <span class="at">species =</span> <span class="dv">9606</span>)  <span class="co"># Human genome</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p><strong>Prepare Your List of Genes</strong>: Create a list of gene symbols you want to query. For example:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>gene_list <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"BRCA1"</span>, <span class="st">"TP53"</span>, <span class="st">"MYC"</span>, <span class="st">"EGFR"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
-<li><p><strong>Map Gene Symbols to STRING IDs</strong>: Convert gene symbols to STRING IDs using the <code>map</code> function. This step ensures that the genes are recognized by STRINGdb.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>gene_ids <span class="ot">&lt;-</span> string_db<span class="sc">$</span><span class="fu">map</span>(gene_list, <span class="st">"gene_name"</span>, <span class="at">removeUnmapped =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>string_db <span class="ot">&lt;-</span> STRINGdb<span class="sc">$</span><span class="fu">new</span>(<span class="at">version =</span> <span class="st">"11.5"</span>, <span class="at">species =</span> <span class="dv">9606</span>, <span class="at">score_threshold=</span><span class="dv">400</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<li><p><strong>Map Gene Symbols to STRING IDs</strong>:</p></li>
+</ol>
+<p>En bioinformática, es común querer mapear símbolos de genes a sus correspondientes IDs en bases de datos específicas como STRING.</p>
+<p>We previously got the gene symbols for the genes that are associated with the HPO term HP:0000118. We must now convert these gene symbols to STRING IDs using the <code>map</code> function. This step ensures that the genes are recognized by STRINGdb.</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>gene_ids <span class="ot">&lt;-</span> string_db<span class="sc">$</span><span class="fu">map</span>(<span class="fu">data.frame</span>(<span class="at">gene=</span>gene_symbols), <span class="st">"gene"</span>, <span class="at">removeUnmappedRows=</span><span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="6" type="1">
 <li><p><strong>Retrieve Interactions</strong>: Query STRINGdb to get the interactions for the list of genes.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>interactions <span class="ot">&lt;-</span> string_db<span class="sc">$</span><span class="fu">get_interactions</span>(gene_ids<span class="sc">$</span>STRING_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>interactions <span class="ot">&lt;-</span> string_db<span class="sc">$</span><span class="fu">get_interactions</span>(gene_ids<span class="sc">$</span>STRING_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol>
 </section>
 <section id="step-2-convert-results-into-an-igraph-object" class="level3" data-number="2.4.2">
 <h3 data-number="2.4.2" class="anchored" data-anchor-id="step-2-convert-results-into-an-igraph-object"><span class="header-section-number">2.4.2</span> Step 2: Convert Results into an igraph Object</h3>
 <ol type="1">
 <li><p><strong>Create an Edge List</strong>: Extract the relevant information (e.g., interaction scores) from the STRINGdb results to create an edge list for igraph.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>edge_list <span class="ot">&lt;-</span> interactions[, <span class="fu">c</span>(<span class="st">"protein1"</span>, <span class="st">"protein2"</span>, <span class="st">"combined_score"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>edge_list <span class="ot">&lt;-</span> interactions[, <span class="fu">c</span>(<span class="st">"protein1"</span>, <span class="st">"protein2"</span>, <span class="st">"combined_score"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p><strong>Build the igraph Object</strong>: Create an igraph object from the edge list. This will be used for network visualization and analysis.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph_from_data_frame</span>(<span class="at">d =</span> edge_list, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph_from_data_frame</span>(<span class="at">d =</span> edge_list, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 <li><p><strong>Visualize the Network</strong>: Use <code>igraph</code> and <code>ggplot2</code> to visualize the network. Customize the plot as needed.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic plot</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.label =</span> <span class="fu">V</span>(g)<span class="sc">$</span>name, <span class="at">edge.width =</span> <span class="fu">E</span>(g)<span class="sc">$</span>combined_score <span class="sc">/</span> <span class="dv">100</span>, </span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.size =</span> <span class="dv">5</span>, <span class="at">vertex.label.cex =</span> <span class="fl">0.7</span>, <span class="at">main =</span> <span class="st">"Protein Interaction Network"</span>)</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Optional: Advanced visualization using ggplot2</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggraph)</span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggraph</span>(g, <span class="at">layout =</span> <span class="st">'fr'</span>) <span class="sc">+</span> </span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link</span>(<span class="fu">aes</span>(<span class="at">width =</span> <span class="fu">E</span>(g)<span class="sc">$</span>combined_score <span class="sc">/</span> <span class="dv">100</span>)) <span class="sc">+</span> </span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">size =</span> <span class="dv">5</span>) <span class="sc">+</span> </span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> name), <span class="at">repel =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic plot</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.label =</span> <span class="fu">V</span>(g)<span class="sc">$</span>name, <span class="at">edge.width =</span> <span class="fu">E</span>(g)<span class="sc">$</span>combined_score <span class="sc">/</span> <span class="dv">100</span>, </span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.size =</span> <span class="dv">5</span>, <span class="at">vertex.label.cex =</span> <span class="fl">0.7</span>, <span class="at">main =</span> <span class="st">"Protein Interaction Network"</span>)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Optional: Advanced visualization using ggplot2</span></span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggraph)</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggraph</span>(g, <span class="at">layout =</span> <span class="st">'fr'</span>) <span class="sc">+</span> </span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_edge_link</span>(<span class="fu">aes</span>(<span class="at">width =</span> <span class="fu">E</span>(g)<span class="sc">$</span>combined_score <span class="sc">/</span> <span class="dv">100</span>)) <span class="sc">+</span> </span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_point</span>(<span class="at">size =</span> <span class="dv">5</span>) <span class="sc">+</span> </span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_node_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> name), <span class="at">repel =</span> <span class="cn">TRUE</span>) <span class="sc">+</span></span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_graph</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div></li>
 </ol>
 </section>
 <section id="descripción-de-los-pasos" class="level3" data-number="2.4.3">
