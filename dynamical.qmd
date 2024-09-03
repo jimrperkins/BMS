@@ -1,0 +1,6 @@
+# Dynamical stuff
+
+```{r}
+xx <- 1:10
+plot(xx)
+```
