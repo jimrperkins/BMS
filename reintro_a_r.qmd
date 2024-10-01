@@ -256,7 +256,7 @@ degree(g)
 betweenness(g)
 
 # Graficar el grafo con tamaños de nodo proporcionales a su grado
-plot(g, vertex.size=degree(g)*10, vertex.label=V(g)$name, main="Red de Interacción Proteína-Proteína (Tamaño del Nodo ~ Grado)")
+plot(g, vertex.size=degree(g)*10, vertex.label=V(g)$name, main="Red IPP (Tamaño de nodo ~Grado)")
 ```
 
 ```{r}
