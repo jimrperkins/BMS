@@ -1,47 +1,26 @@
 # (Re)introducción a R para Biología y Bioinformática
 
-Bienvenidos a la Reintroducción a R. En esta sesión de una hora, aprenderás y os recordaremos los conceptos básicos de la programación en R con ejemplos relacionados con la biología y la bioinformática, incluyendo una introducción al análisis de redes usando `igraph`.
+Bienvenidos a la Reintroducción a R. En esta sesión de una hora, aprendereis y os recordaremos los conceptos básicos de la programación en R con ejemplos relacionados con la biología y la bioinformática, incluyendo una introducción al análisis de redes usando `igraph`.
 
 ## Objetivos
 
 Al final de este tutorial, podrás:
-- Entender la sintaxis básica y la estructura de R
-- Realizar operaciones simples con datos
-- Crear gráficos básicos relevantes para la biología y la bioinformática
-- Entender los conceptos básicos del análisis de redes con `igraph`
+
+-   Entender la sintaxis básica y la estructura de R.
+
+-   Realizar operaciones simples con datos.
+
+-   Crear gráficos básicos relevantes para la biología y la bioinformática.
+
+-   Entender los conceptos básicos del análisis de redes con `igraph`.
 
 ## Comenzando
 
-R es un lenguaje poderoso para la computación estadística y gráfica, ampliamente utilizado en bioinformática. Para empezar a usar R, necesitas tener R y RStudio instalados en tu ordenador. Puedes descargarlos desde los siguientes enlaces:
-- [Descargar R](https://cran.r-project.org/)
-- [Descargar RStudio](https://www.rstudio.com/products/rstudio/download/)
+R es un lenguaje poderoso para la computación estadística y gráfica, ampliamente utilizado en bioinformática. Para empezar a usar R, necesitas tener R y RStudio instalados en tu ordenador. Puedes descargarlos desde los siguientes enlaces: - [Descargar R](https://cran.r-project.org/) - [Descargar RStudio](https://www.rstudio.com/products/rstudio/download/)
 
 ## Sintaxis Básica
 
 Comencemos con algunos comandos y operaciones básicas en R. Abre RStudio y prueba los siguientes ejemplos.
-
-### Aritmética Básica
-
-El contenido de GC se refiere al porcentaje de bases nitrogenadas guanina (G) y citosina (C) en una molécula de ADN. Es una medida importante porque:
-
-1. **Estabilidad del ADN**: Las regiones del ADN con alto contenido de GC son más estables debido al triple enlace de hidrógeno entre G y C, en comparación con el doble enlace de A y T.
-2. **Evolución y Adaptación**: Las diferencias en el contenido de GC pueden reflejar adaptaciones evolutivas a diferentes temperaturas ambientales, ya que las regiones con alto GC pueden ser más resistentes al calor.
-3. **Función Genómica**: Algunas regiones funcionales del genoma, como los promotores de genes y las islas CpG, tienden a tener un alto contenido de GC, lo cual es crucial para la regulación genética.
-
-```{r}
-# Calcular el contenido de GC de una secuencia de ADN
-g <- 200
-c <- 180
-a <- 150
-t <- 170
-
-# Número total de nucleótidos
-total_nt <- g + c + a + t
-
-# Porcentaje de contenido de GC
-gc_content <- ((g + c) / total_nt) * 100
-gc_content
-```
 
 ### Asignación de Variables
 
@@ -79,6 +58,38 @@ is_protein_coding <- TRUE
 class(is_protein_coding)
 ```
 
+### Operaciones numéricas básicas
+
+El contenido de GC se refiere al porcentaje de bases nitrogenadas guanina (G) y citosina (C) en una molécula de ADN. Es una medida importante porque:
+
+1.  **Estabilidad del ADN**: Las regiones del ADN con alto contenido de GC son más estables debido al triple enlace de hidrógeno entre G y C, en comparación con el doble enlace de A y T.
+2.  **Evolución y Adaptación**: Las diferencias en el contenido de GC pueden reflejar adaptaciones evolutivas a diferentes temperaturas ambientales, ya que las regiones con alto GC pueden ser más resistentes al calor.
+3.  **Función Genómica**: Algunas regiones funcionales del genoma, como los promotores de genes y las islas CpG, tienden a tener un alto contenido de GC, lo cual es crucial para la regulación genética.
+
+```{r}
+# Calcular el contenido de GC de una secuencia de ADN 
+g <- 200
+c <- 180
+a <- 150
+t <- 170
+# Número total de nucleótidos 
+total_nt <- g + c + a + t  
+# Porcentaje de contenido de GC 
+gc_content <- ((g + c) / total_nt) * 100 
+gc_content
+```
+
+```{r}
+# Algunas operaciones extras son
+# la raiz
+sqrt(4)
+# la exponencial
+exp(2)
+# elevar con una potencia
+2^3
+sqrt(4)^2
+```
+
 ## Estructuras de Datos Básicas
 
 R proporciona varias estructuras de datos como vectores, matrices, listas y data frames. Vamos a explorar algunas de estas.
@@ -91,10 +102,19 @@ Los vectores son la estructura de datos más básica en R y pueden contener una 
 # Crear un vector numérico de longitudes de genes
 gene_lengths <- c(1000, 1500, 2000, 2500, 3000)
 gene_lengths
-
 # Crear un vector de caracteres de nombres de genes
 gene_names <- c("GeneA", "GeneB", "GeneC", "GeneD", "GeneE")
 gene_names
+```
+
+```{r}
+# Algunas operaciones básicas con ellos
+1 + 3 * gene_lengths
+length(gene_lengths)
+# Extraer datos de vector
+gene_lengths[3]
+gene_lengths[2:5]
+gene_lengths[c(2,5)]
 ```
 
 ### Data Frames
@@ -109,16 +129,28 @@ genes_df <- data.frame(
   GC_Content = c(45, 50, 55, 47, 52)
 )
 genes_df
+```
 
-# Acceder a elementos del data frame
+```{r}
+# Extraer datos de dataframe
 genes_df$Name       # Acceder a una columna por nombre
-genes_df[1, ]       # Acceder a la primera fila
 genes_df[, "Length"] # Acceder a una columna por nombre usando índices
+genes_df[1, ] # Acceder a la primera fila
+class(genes_df[1, ]) # miremos la clase de dato que devuelve
+genes_df[1:2,] 
+genes_df[c(1, 3),]
+genes_df[c(1,3)]
+```
+
+```{r}
+# obtener algunas metricas sobre el dataframe
+dim(genes_df)
+summary(genes_df)
 ```
 
 ## Graficación Básica
 
-R es bien conocido por sus potentes capacidades de graficación. Aquí, crearemos un gráfico simple usando la función incorporada `plot`.
+R es bien conocido por sus potentes capacidades de graficado. Aquí, crearemos un gráfico simple usando la función incorporada `plot`.
 
 ### Gráfico de Dispersión
 
@@ -134,6 +166,21 @@ plot(genes_df$Length, genes_df$GC_Content, main="Longitud de Genes vs Contenido 
 hist(genes_df$Length, main="Distribución de Longitudes de Genes", xlab="Longitud de Genes", col="green", border="black")
 ```
 
+### Boxplot
+
+```{r}
+# Boxplot básico de longitudes de genes 
+boxplot(genes_df$Length, main="Distribución de Longitudes de Genes", xlab="Longitud de Genes", col="blue", border="black")
+```
+
+### Visualización de gráficas avanzada con ggplot2
+
+```{r}
+library(ggplot2)
+ggplot(genes_df, aes(x=Length)) + geom_boxplot(fill="slateblue", alpha=0.2)
+ggplot(genes_df, aes(x=Length, y=GC_Content)) + geom_point() + xlab("Longitud de Genes") + ylab("Contenido de GC (%)")
+```
+
 ## Introducción al Análisis de Redes con `igraph`
 
 El análisis de redes es un aspecto crucial de la bioinformática, especialmente en la comprensión de vías e interacciones biológicas. El paquete `igraph` en R es una herramienta poderosa para crear y analizar grafos.
@@ -142,14 +189,11 @@ El análisis de redes es un aspecto crucial de la bioinformática, especialmente
 
 Primero, necesitas cargar el paquete `igraph`.
 
-¿Qué es un Paquete en R?
-En R, un paquete es una colección de funciones, datos y código que extienden las capacidades básicas del lenguaje. Los paquetes son creados por la comunidad de R y están diseñados para abordar tareas específicas, desde análisis estadísticos avanzados hasta visualización de datos y manejo de datos biológicos. Los paquetes facilitan el trabajo con R al proporcionar herramientas adicionales que puedes usar en tus scripts y análisis.
+¿Qué es un Paquete en R? En R, un paquete es una colección de funciones, datos y código que extienden las capacidades básicas del lenguaje. Los paquetes son creados por la comunidad de R y están diseñados para abordar tareas específicas, desde análisis estadísticos avanzados hasta visualización de datos y manejo de datos biológicos. Los paquetes facilitan el trabajo con R al proporcionar herramientas adicionales que puedes usar en tus scripts y análisis.
 
-Instalación y Carga de Paquetes
-Para utilizar un paquete en R, primero necesitas instalarlo (si no está ya instalado) y luego cargarlo en tu sesión de R.
+Instalación y Carga de Paquetes Para utilizar un paquete en R, primero necesitas instalarlo (si no está ya instalado) y luego cargarlo en tu sesión de R.
 
-Instalación de Paquetes
-Puedes instalar un paquete desde CRAN (Comprehensive R Archive Network) utilizando la función install.packages():
+Instalación de Paquetes Puedes instalar un paquete desde CRAN (Comprehensive R Archive Network) utilizando la función install.packages():
 
 Ahora vamos a cargar un paquee que ya esta instalado, usando el comando library()
 
@@ -162,9 +206,9 @@ library(igraph)
 
 Representar proteínas en un formato de red puede ser útil por varias razones:
 
-1. **Visualización de Interacciones**: Permite ver cómo las proteínas interactúan entre sí y formar una visión general de las redes de interacción.
-2. **Identificación de Proteínas Clave**: Ayuda a identificar proteínas que tienen un papel central o que son esenciales en la red.
-3. **Análisis de Funciones Biológicas**: Facilita la comprensión de las funciones biológicas y cómo las alteraciones en una proteína pueden afectar toda la red.
+1.  **Visualización de Interacciones**: Permite ver cómo las proteínas interactúan entre sí y formar una visión general de las redes de interacción.
+2.  **Identificación de Proteínas Clave**: Ayuda a identificar proteínas que tienen un papel central o que son esenciales en la red.
+3.  **Análisis de Funciones Biológicas**: Facilita la comprensión de las funciones biológicas y cómo las alteraciones en una proteína pueden afectar toda la red.
 
 Vamos a crear una red simple de interacciones proteína-proteína.
 
@@ -179,8 +223,26 @@ edges <- c("ProteinA", "ProteinB",
 
 # Crear un objeto de grafo
 g <- graph(edges, directed=FALSE)
+```
 
+```{r}
+# Extracción de principales objetos
+V(g)
+E(g)
+V(g)$name
+```
+
+```{r}
 # Graficar el grafo
+plot(g, vertex.label=V(g)$name, main="Red de Interacción Proteína-Proteína")
+```
+
+```{r}
+# Incorporar vértices
+g <- add_vertices(g, 1, name = "NewProtein")
+plot(g, vertex.label=V(g)$name, main="Red de Interacción Proteína-Proteína")
+# Incorporar edges
+g <- add_edges(g, edges = c("ProteinD", "NewProtein"), directed=FALSE)
 plot(g, vertex.label=V(g)$name, main="Red de Interacción Proteína-Proteína")
 ```
 
@@ -191,9 +253,15 @@ Puedes realizar varios análisis en la red, como encontrar el grado de cada nodo
 ```{r}
 # Calcular el grado de cada nodo
 degree(g)
+betweenness(g)
 
 # Graficar el grafo con tamaños de nodo proporcionales a su grado
 plot(g, vertex.size=degree(g)*10, vertex.label=V(g)$name, main="Red de Interacción Proteína-Proteína (Tamaño del Nodo ~ Grado)")
+```
+
+```{r}
+hist(degree(g), main="Distribución del grado de los nodos", xlab="", col="blue", border="black")
+plot(betweenness(g), degree(g), main="Betweenness vs degree", xlab="Betweenness", ylab="Degree")
 ```
 
 ## Conclusión
@@ -202,7 +270,4 @@ Ahora has sido introducido a los conceptos básicos de la programación en R con
 
 ## Recursos Adicionales
 
-Aquí hay algunos recursos para ayudarte a seguir aprendiendo R y bioinformática:
-- [Documentación de R](https://www.rdocumentation.org/)
-- [Bioconductor](https://www.bioconductor.org/)
-- [Hojas de Referencia de RStudio](https://www.rstudio.com/resources/cheatsheets/)
+Aquí hay algunos recursos para ayudarte a seguir aprendiendo R y bioinformática: - [Documentación de R](https://www.rdocumentation.org/) - [Bioconductor](https://www.bioconductor.org/) - [Hojas de Referencia de RStudio](https://www.rstudio.com/resources/cheatsheets/)
