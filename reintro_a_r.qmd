@@ -148,6 +148,36 @@ dim(genes_df)
 summary(genes_df)
 ```
 
+## Control de flujo
+
+### Reailzar tareas de forma iterativa
+
+En ocasiones queremos llevar a cabo una misma tarea para distintos elementos de una lista, vector... o demás objetos iterables.
+
+```{r}
+dna <- "atcccgaggtagcgagcgtgca"
+dna_vector <- strsplit(dna, "")[[1]]
+for (nucl in dna_vector) {
+	print(nucl)
+}
+```
+
+### Adición de condicionales
+
+Si en el flujo de trabajo queremos controlar lo que se haga según las circunstancias podemos utilizar lo siguiente.
+
+```{r}
+dna <- "atcccgaggtagcgagcgtgca"
+dna_vector <- strsplit(dna, "")[[1]]
+gc_content <- 0
+for (nucl in dna_vector) {
+	if ( nucl == "g" || nucl == "c" ) {
+	  gc_content <- gc_content + 1
+	}
+}
+(gc_content/length(dna_vector))*100
+```
+
 ## Graficación Básica
 
 R es bien conocido por sus potentes capacidades de graficado. Aquí, crearemos un gráfico simple usando la función incorporada `plot`.
@@ -263,6 +293,25 @@ plot(g, vertex.size=degree(g)*10, vertex.label=V(g)$name, main="Red IPP (Tamaño
 hist(degree(g), main="Distribución del grado de los nodos", xlab="", col="blue", border="black")
 plot(betweenness(g), degree(g), main="Betweenness vs degree", xlab="Betweenness", ylab="Degree")
 ```
+
+### Otro ejemplo de red
+
+```{r}
+graph_example <- make_graph("Zachary")
+# Se puede establecer el tipo de layout que quieres...layout_with_kk, layout_in_circle,...
+layout <- layout_with_fr(graph_example)
+plot(graph_example, layout = layout, vertex.size = 20, vertex.label = NA, vertex.color = "skyblue", edge.arrow.size = 0.5, edge.color = "gray") 
+layout <- layout_with_kk(graph_example)
+plot(graph_example, layout = layout, vertex.size = 20, vertex.label = NA, vertex.color = "skyblue", edge.arrow.size = 0.5, edge.color = "gray")
+layout <- layout_in_circle(graph_example)
+plot(graph_example, layout = layout, vertex.size = 20, vertex.label = NA, vertex.color = "skyblue", edge.arrow.size = 0.5, edge.color = "gray")
+```
+```{r}
+layout <- layout_with_fr(graph_example)
+plot(graph_example, layout = layout, vertex.size = degree(graph_example), vertex.label = NA, vertex.color = "skyblue", edge.arrow.size = 0.5, edge.color = "gray")
+```
+
+
 
 ## Conclusión
 
