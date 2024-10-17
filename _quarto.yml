@@ -4,7 +4,9 @@ project:
 
 book:
   title: "BMS"
-  author: "Norah Jones"
+  author: 
+    - "James R Perkins"
+    - "Federico Garcia Criado"
   date: "7/26/2024"
   chapters:
     - index.qmd
