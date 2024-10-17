@@ -9,6 +9,7 @@ book:
   chapters:
     - index.qmd
     - reintro_a_r.qmd
+    - hpo_redes1.qmd
     - summary.qmd
     - references.qmd
 

@@ -1,3 +1,329 @@
-# Redes 1: HPO y STRINGdb
+# Practica Redes 1: Análisis de redes con R y iGRAPH:
 
-Text and code to get genes from HPO and use them to create networks.
+En este tutorial, exploraremos cómo obtener una lista de genes asociados con el fenotipo de *morfología anormal del corpúsculo renal* de la Ontología de Fenotipos Humanos (HPO). Luego, utilizaremos esta lista de genes para construir una red de interacción genética utilizando STRINGdb en R y la analizaremos con el paquete igraph.
+
+### Objetivos
+
+1.  Descargar una lista de genes de la HPO.
+2.  Obtener una red de interacción genética utilizando STRINGdb.
+3.  Convertir la red al formato igraph.
+4.  Visualizar la red y analizar sus propiedades.
+5.  Agrupar la red y visualizar los grupos.
+
+### Quick Reminder - Terminologia: 
+
+Las **funciones** son bloques de código que realizan tareas específicas y pueden tomar **argumentos** como entrada para personalizar su comportamiento. Por ejemplo, la función `plot()` se utiliza para crear gráficos:
+
+```{r, eval =FALSE}
+x <- c(1, 2, 3, 4)
+y <- c(10, 20, 15, 25)
+
+plot(x, y, main = "Gráfico de Ejemplo", xlab = "Eje X", ylab = "Eje Y")
+```
+
+En este caso, `x` e `y` son vectores que contienen los datos, y `main`, `xlab` y `ylab` son argumentos que establecen el título y las etiquetas de los ejes.
+
+*Si quieres encontrar informacion y ayuda relacionada con una funcion, se puede usar el comando `?function_name`, por ejemplo `?plot` te proporcionara informacion acerca de los argumentos para el comando, lo que devuelve el comando, y daria ejemplos de su uso.*
+
+
+Los **objetos** son contenedores de datos que pueden ser vectores (secuencias de elementos del mismo tipo) o data frames (tablas con columnas de diferentes tipos de datos) o otras estructuras.
+
+Los **paquetes** son colecciones de funciones que amplían las capacidades de R. Se instalan y cargan usando `install.packages()` y `library()`, respectivamente.
+
+Comprender estos conceptos te ayudará a navegar por R y aplicar herramientas para el análisis de datos en biología molecular.
+
+## Parte 1: Descargar la Lista de Genes de la HPO
+
+### Descarga Manual
+
+1.  Navega al [sitio web de la Ontología de Fenotipos Humanos (HPO)](https://hpo.jax.org).
+2.  Busca *abnormal renal corpuscle morphology* en la barra de búsqueda.
+3.  Haz clic en el fenotipo para ver los detalles.
+4.  Localiza la lista de genes asociados y descárgala en formato de texto (Export Associations).
+
+ANOTA el codigo HPO del fenotipo, nos va a hacer falta para el siguiente paso:
+
+### Uso de la API
+
+#### ¿Qué es una API?
+
+Una **Interfaz de Programación de Aplicaciones (API)** permite que diferentes aplicaciones de software se comuniquen entre sí. En nuestro caso, nos permite acceder programáticamente a datos de la HPO. Puedes usar una API para obtener automáticamente la lista de genes sin tener que descargarla manualmente.
+
+Para usar la API, aquí hay un ejemplo de cómo obtener genes programáticamente. Primero, necesitamos instalar y cargar las bibliotecas necesarias:
+
+```{r, eval=FALSE}
+# Install necessary packages if not already installed
+if (!requireNamespace("httr", quietly = TRUE)) {
+  install.packages("httr")
+}
+if (!requireNamespace("jsonlite", quietly = TRUE)) {
+  install.packages("jsonlite")
+}
+
+library(httr)
+library(jsonlite)
+
+# API request to get genes associated with the HPO term for abnormal renal corpuscle morphology
+hpo_id <- "HP:0031263"  # HPO ID for abnormal renal corpuscle morphology
+
+url <- paste0("https://ontology.jax.org/api/network/annotation/", hpo_id)
+
+response <- GET(url)
+data <- content(response, as = "text", encoding = "UTF-8")
+genes <- fromJSON(data)$genes
+
+# Display the first few genes
+head(genes)
+
+# Display all the genes
+print(genes)
+```
+
+### Preguntas
+
+*¿Qué función cumple `requireNamespace()` en el contexto de la instalación de paquetes en R?*
+
+```         
+Respuesta: requireNamespace() verifica si un paquete está instalado y disponible para ser utilizado sin cargarlo en el entorno de trabajo. Esto es importante porque permite comprobar la disponibilidad de un paquete antes de intentar usarlo, evitando errores si el paquete no está instalado. Si el paquete no está disponible, se puede instalar automáticamente con install.packages(), asegurando que el código se ejecute sin interrupciones.
+```
+
+*En la línea `url <- paste0("https://ontology.jax.org/api/network/annotation/", hpo_id)`, ¿qué papel juega `paste0()` en la construcción de la URL?*
+
+```         
+Respuesta: paste0() se utiliza para concatenar cadenas de texto sin ningún separador. En este caso, une la parte estática de la URL con el identificador HPO (hpo_id). Si se utilizara paste() en lugar de paste0(), el resultado podría incluir un espacio adicional, lo que generaría una URL incorrecta. Por ejemplo, paste() usaría un espacio por defecto como separador entre los elementos concatenados, lo que provocaría un error al intentar acceder a la URL.
+```
+
+*¿Cuál es el propósito de las funciones `GET()` y `content()` en este código?*
+
+```         
+Respuesta: La función GET() realiza una solicitud HTTP para obtener datos de la URL especificada. En este caso, se utiliza para recuperar información sobre genes asociados con un término HPO. La función content() procesa la respuesta de la solicitud, extrayendo el contenido del cuerpo de la respuesta en un formato específico (en este caso, como texto). Después, fromJSON() convierte ese texto JSON en un objeto R que puede manipularse fácilmente. Se espera que el objeto resultante contenga una lista de genes que se pueden utilizar para análisis posteriores.
+```
+
+*¿Cuáles son las ventajas de descargar datos directamente de una API?*
+
+```         
+Respuesta: Utilizar una API permite obtener datos de manera automática, lo que puede ahorrar tiempo y reducir errores. Las API también suelen proporcionar datos actualizados y en un formato estructurado, lo que facilita su análisis.
+```         
+*¿Cuáles podrían ser algunas limitaciones o desafíos de usar una API para la recuperación de datos?*
+
+```
+Respuesta: Algunas limitaciones pueden incluir la necesidad de una conexión a internet, la posibilidad de que la API tenga restricciones de uso o limitaciones en la cantidad de datos que se pueden solicitar a la vez. También puede haber problemas de compatibilidad si los datos devueltos por la API cambian.
+```
+
+*¿Puedes encontrar una función que te diga cuántas filas hay en el objeto genes? ¿Qué representa este número? ¿Cómo se compara con los resultados del web de HPO?*
+
+```
+Respuesta: Para contar cuántas filas hay en el objeto genes, puedes usar la función nrow() en R. Esta función devuelve el número de filas de un marco de datos o de una matriz. Este número representa la cantidad de genes que se han asociado con el fenotipo de interés, en este caso, morfología anormal del corpúsculo renal. Cada fila en el objeto genes corresponde a un gen único relacionado con ese fenotipo. Debe ser igual que el numero encontrado por el Web.
+```
+
+## Parte 2: Obtención de la Red de Interacción con STRINGdb
+
+Una vez que hemos obtenido la lista de genes asociados con el fenotipo de morfología anormal del corpúsculo renal, el siguiente paso es explorar cómo estos genes interactúan entre sí. Para ello, utilizaremos la base de datos STRING (Search Tool for the Retrieval of Interacting Genes/Proteins), que proporciona información sobre las interacciones conocidas y pronosticadas entre proteínas y genes. Esta base de datos incluye información sobre interacciones de proteínas a nivel físico, funcional y de co-expresión, lo que es esencial para entender las vías biológicas y las redes de señalización involucradas en diversas condiciones fenotípicas.
+
+A través de la API de STRING, podemos obtener de manera programática una red de interacción que nos ayudará a visualizar y analizar las relaciones entre los genes de interés. Utilizaremos el paquete STRINGdb en R para acceder a estas interacciones y construir la red que analizaremos posteriormente.
+
+A continuación, aseguramos de que tienes el paquete STRINGdb instalado y luego procederemos a obtener la red de interacción.
+
+```{R, eval=FALSE}
+
+# Install the STRINGdb package if not already installed
+if (!requireNamespace("STRINGdb", quietly = TRUE)) {
+  install.packages("STRINGdb")
+}
+
+library(STRINGdb)
+
+# Initialize STRINGdb with the appropriate version and species
+string_db <- STRINGdb$new(version = "12", species = 9606, score_threshold = 800, input_directory = "")
+
+# Fetch interactions for the gene list
+# Replace 'genes' with your actual gene list variable
+gene_ids <- genes$name  # Adjust according to your downloaded data structure
+string_ids <- string_db$map( genes, "name", removeUnmappedRows = TRUE )
+
+interaction_network <- string_db$get_interactions(string_ids$STRING_id)
+interaction_network <- unique(interaction_network[, 1:2]) # necessary step to remove duplicate interactions
+interaction_network$to <- string_ids$name[match(interaction_network$to, string_ids$STRING_id)]
+interaction_network$from <- string_ids$name[match(interaction_network$from, string_ids$STRING_id)]
+
+# Display the first few rows of the interaction network
+head(interaction_network)
+```
+
+### Preguntas
+
+*¿Qué significa la línea `string_db <- STRINGdb$new(version = "12", species = 9606, score_threshold = 400, input_directory = ""`)?*
+
+    Respuesta: Esta línea inicializa un nuevo objeto STRINGdb, configurando la versión de la base de datos a utilizar (en este caso, la versión 12), especificando el organismo (especie humana, cuyo código es 9606) y estableciendo un umbral de puntuación de 400 para las interacciones que se consideran relevantes. El parámetro input_directory se deja vacío porque no se están usando archivos de entrada locales.
+
+*¿Cuál es el propósito de la línea `string_ids <- string_db$mp(gene_ids)`?*
+
+    Respuesta: La función mp() convierte los identificadores de genes (en este caso, almacenados en gene_ids) a los identificadores de STRING. Esto es necesario porque los genes pueden tener diferentes identificadores en diferentes bases de datos, y mp() asegura que se utilicen los correctos en la base de datos STRING.
+
+*¿Por qué es importante establecer un `score_threshold` al inicializar STRINGdb?*
+
+    Respuesta: El score_threshold define el umbral mínimo de puntuación para las interacciones que se incluirán en la red. Interacciones con puntuaciones por debajo de este umbral serán excluidas, lo que ayuda a centrarse en las interacciones más relevantes y significativas y a reducir el ruido en los datos.
+
+*¿Cuántas filas hay en el objeto interaction_network? ¿Qué representa este número? ¿Qué pasaría si repetimos el ejercicio aumentando el `score_threshold`?*
+
+    Respuesta: Este número representa la cantidad de interacciones que se han obtenido entre los genes de la red. Cada fila en el objeto interaction_network corresponde a una interacción única entre dos genes, donde se especifican detalles sobre la relación entre ellos. Si aumentamos el score_threshold, la red resultante seria mas pequeño.
+
+### Explicación Adicional
+
+En las redes biológicas, a menudo se utilizan redes no dirigidas porque la interacción entre genes no tiene una dirección específica, reflejando interacciones mutuas en lugar de influencias unidireccionales.
+
+## Parte 3: Conversión a Formato igraph y calculos de propiedades de una red
+
+En esta sección, convertiremos la red de interacción obtenida de STRINGdb al formato **igraph**. **igraph** es un paquete en R que proporciona herramientas para crear, manipular y analizar redes. Nos centraremos en calcular propiedades clave de la red que nos ayudarán a entender mejor su estructura.
+
+Primero, asegúrate de tener instalado y cargado el paquete igraph:
+
+```{r, eval=FALSE}
+# Install igraph if it's not already installed
+if (!requireNamespace("igraph", quietly = TRUE)) {
+  install.packages("igraph")
+}
+
+library(igraph)
+```
+
+### Conversión a Formato igraph
+
+Para convertir la red de interacción que hemos obtenido de STRINGdb a un objeto igraph, utilizaremos la función `graph_from_data_frame()`, que permite crear una red a partir de un data frame que contiene las interacciones.
+
+Asumamos que interaction_network tiene al menos dos columnas: gene1 y gene2, que representan los nodos conectados. La conversión se realiza de la siguiente manera:
+
+```{r, eval=FALSE}
+
+# Convert the interaction network downloaded from STRING into igraph format
+g <- graph_from_data_frame(interaction_network, directed = FALSE)
+```
+
+### Cálculo de Propiedades de la Red
+
+Una vez que tenemos nuestra red en formato igraph, podemos calcular diversas propiedades que nos brindan información sobre su estructura y características. A continuación, se presentan algunas propiedades importantes que puedes calcular:
+
+#### Número de Nodos y Aristas
+
+Podemos calcular el número total de nodos y aristas en la red utilizando las funciones gorder() y gsize():
+
+```{r, eval=FALSE}
+
+# Calculate numbers of nodes and edges
+num_nodes <- gorder(g)  # Number of nodes
+num_edges <- gsize(g)  # Number of edges
+
+cat("Number of nodes:", num_nodes, "\n")
+cat("Number of edges:", num_edges, "\n")
+```
+
+#### Grado Promedio de los Nodos
+
+El grado de un nodo es el número de conexiones que tiene. Podemos calcular el grado promedio de todos los nodos en la red:
+
+```{r, eval=FALSE}
+
+# Calculate the degree (grado) of every node
+degree_values <- degree(g)
+
+# Calculate the average
+average_degree <- mean(degree_values)
+cat("Average degree of all nodes:", average_degree, "\n")
+```
+
+#### Densidad de la Red
+
+La densidad de una red es una medida que indica qué tan conectados están los nodos entre sí. Se calcula como el número de aristas dividido por el número máximo posible de aristas:
+
+```{r, eval=FALSE}
+
+# Calculate the density of the network
+network_density <- edge_density(g)
+cat("Network density:", network_density, "\n")
+```
+
+#### Centralidad
+
+La centralidad nos ayuda a identificar los nodos más importantes dentro de la red. Podemos calcular diferentes medidas de centralidad, aqui vemos centralidad de cercanía:
+
+```{r, eval=FALSE}
+
+# Calculate Closeness Centrality (centralidad de cercanía)
+centrality_closeness <- closeness(g)
+
+# Show results
+cat("Closeness Centrality (first 5 nodos):", head(centrality_closeness, 5), "\n")
+```
+
+### Preguntas
+
+Después de calcular estas propiedades, reflexiona sobre las siguientes preguntas:
+
+*¿Cuál es la importancia de crear una red no dirigido en el contexto de las interacciones génicas? Como hemos creado una red no dirigida?*
+  
+    En las redes biológicas, a menudo se utilizan redes no dirigidos porque la interacción entre genes no tiene una dirección específica, reflejando interacciones mutuas en lugar de influencias unidireccionales.
+
+*¿Qué información proporcionan estas métricas sobre la red de interacción de genes?*
+
+    El número de nodos y aristas nos muestra cuántos genes y cuántas interacciones hay en la red, proporcionando una idea de su complejidad. El grado promedio indica cuántas conexiones tiene cada gen en promedio, lo que refleja cuán interconectados están los genes. La densidad nos informa sobre la proporción de conexiones posibles que realmente ocurren, y la centralidad identifica genes clave que podrían desempeñar roles críticos en la red
+
+*¿Hay nodos que se destacan por su grado o centralidad? ¿Cómo podría esto estar relacionado con sus funciones biológicas?*
+
+    Los nodos con mayor grado o centralidad suelen ser hubs dentro de la red, lo que significa que están muy conectados o son esenciales para la transmisión de información. En un contexto biológico, estos genes pueden estar implicados en funciones importantes o regulando varias vías. Si estos genes clave están relacionados con la morfología anormal del corpúsculo renal, podrían ser cruciales para entender las bases moleculares de esta enfermedad.
+
+*¿Qué implicaciones podrían tener estas propiedades para entender la morfología anormal del corpúsculo renal?*
+
+    El análisis de estas propiedades te ayudará a desarrollar una comprensión más profunda de las interacciones en la red y su relevancia en contextos biológicos.
+
+## Parte 4: Visualizando la Red
+
+Una vez que tenemos nuestra red en formato igraph, podemos proceder a realizar diversas visualizaciones y análisis estadísticos. La visualización es una parte crucial del análisis de redes, ya que nos ayuda a entender la distribución y la relación entre los diferentes nodos.
+
+En esta sección, utilizaremos funciones del paquete igraph para crear gráficos visualmente informativos que representen las interacciones entre genes. Además, calcularemos estadísticas de la red, como el número de nodos e interacciones, lo que nos permitirá obtener una visión general de la complejidad y la conectividad de nuestra red. Esto es especialmente relevante en biología molecular, donde las interacciones entre genes pueden proporcionar información valiosa sobre funciones biológicas y mecanismos de enfermedades.
+
+### Gráfico Básico
+
+```{r, eval=FALSE}
+# Basic plot of the network
+plot(g, vertex.size=5, vertex.label.cex=0.7, edge.arrow.size=0.5, main="Basic Interaction Network")
+```
+
+### Visualizaciones Personalizadas
+
+#### Disposición de Fruchterman-Reingold
+
+```{r, eval=FALSE}
+layout <- layout_with_fr(g)  # Fruchterman-Reingold layout
+plot(g, layout = layout, vertex.color = "skyblue", vertex.size = 5, edge.width = 0.5, main = "Fruchterman-Reingold Layout")
+```
+
+#### Disposición Circular
+
+```{r, eval=FALSE}
+# Help page access
+?layout_in_circle  # Recuerda cómo acceder a las páginas de ayuda
+
+# Plot with circular layout
+circular_layout <- layout_in_circle(g)
+plot(g, layout = circular_layout, vertex.color = "lightgreen", vertex.size = 5, edge.width = 0.5, main = "Circular Layout")
+```
+
+#### Disposición "nice"
+
+```{r, eval=FALSE}
+
+# Plot with nicely layout
+nice_layout <- layout_nicely(g)
+plot(g, layout = nice_layout, vertex.color = "orange", vertex.size = 5, edge.width = 0.5, main = "Nicely Layout")
+```
+
+### Preguntas
+
+¿Qué observas sobre la estructura de la red en diferentes disposiciones? ¿Hay áreas densamente conectadas?
+    
+    Al observar la estructura de la red en diferentes disposiciones, es posible notar que la disposición afecta la manera en que percibimos la organización de los nodos y las conexiones. En algunas disposiciones, como la disposición en círculo o en rejilla, la estructura general es más clara, pero puede ser difícil identificar áreas con conexiones densas. En cambio, otras "visualizations" tienden a agrupar de manera más natural los nodos más conectados, haciendo que las áreas densamente conectadas se resalten visualmente. Estas áreas densas, conocidas como clusters, suelen estar formadas por grupos de genes que interactúan de manera más fuerte entre sí, lo que podría indicar que participan en procesos biológicos similares o relacionados.
+    
+¿Puedes identificar algunos hubs en la red? ¿Cuál podría ser su significado biológico?
+
+    Sí, es posible identificar agrupaciones claras en la red, conocidas como clusters o módulos, que suelen estar formadas por nodos (genes) que están densamente interconectados entre sí. Estas agrupaciones pueden reflejar grupos de genes que participan en funciones biológicas comunes, como rutas metabólicas, procesos celulares específicos o complejos proteicos. Veremos mas sobre como identificar estos grupos la semana que viene.
+
