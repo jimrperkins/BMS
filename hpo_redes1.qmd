@@ -285,10 +285,17 @@ En esta sección, utilizaremos funciones del paquete igraph para crear gráficos
 
 ```{r, eval=FALSE}
 # Basic plot of the network
-plot(g, vertex.size=5, vertex.label.cex=0.7, edge.arrow.size=0.5, main="Basic Interaction Network")
+plot(g, vertex.size=5, vertex.label.cex=0.7, edge.arrow.size=0.5,  main="Basic Interaction Network")
 ```
 
 ### Visualizaciones Personalizadas
+
+#### Graficado en base a atributo de nodo
+
+```{r, eval=FALSE}
+# Basic plot of the network
+plot(g, vertex.size=degree(g)/2, edge.arrow.size=0.7, vertex.label.cex=0.8, main="Network by degree")
+```
 
 #### Disposición de Fruchterman-Reingold
 
@@ -305,7 +312,7 @@ plot(g, layout = layout, vertex.color = "skyblue", vertex.size = 5, edge.width =
 
 # Plot with circular layout
 circular_layout <- layout_in_circle(g)
-plot(g, layout = circular_layout, vertex.color = "lightgreen", vertex.size = 5, edge.width = 0.5, main = "Circular Layout")
+plot(g, layout = circular_layout, vertex.color = "lightgreen", vertex.size = 5, vertex.label.cex=0.8,edge.width = 0.5, main = "Circular Layout")
 ```
 
 #### Disposición "nice"
@@ -314,7 +321,7 @@ plot(g, layout = circular_layout, vertex.color = "lightgreen", vertex.size = 5, 
 
 # Plot with nicely layout
 nice_layout <- layout_nicely(g)
-plot(g, layout = nice_layout, vertex.color = "orange", vertex.size = 5, edge.width = 0.5, main = "Nicely Layout")
+plot(g, layout = nice_layout, vertex.color = "orange", vertex.size = 5,vertex.label.cex=0.8, edge.width = 0.5, main = "Nicely Layout")
 ```
 
 ### Preguntas
