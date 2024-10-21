@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.45">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -454,35 +454,42 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="2.4.1" class="anchored" data-anchor-id="gráfico-básico"><span class="header-section-number">2.4.1</span> Gráfico Básico</h3>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic plot of the network</span></span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label.cex=</span><span class="fl">0.7</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.5</span>, <span class="at">main=</span><span class="st">"Basic Interaction Network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label.cex=</span><span class="fl">0.7</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.5</span>,  <span class="at">main=</span><span class="st">"Basic Interaction Network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="visualizaciones-personalizadas" class="level3" data-number="2.4.2">
 <h3 data-number="2.4.2" class="anchored" data-anchor-id="visualizaciones-personalizadas"><span class="header-section-number">2.4.2</span> Visualizaciones Personalizadas</h3>
-<section id="disposición-de-fruchterman-reingold" class="level4" data-number="2.4.2.1">
-<h4 data-number="2.4.2.1" class="anchored" data-anchor-id="disposición-de-fruchterman-reingold"><span class="header-section-number">2.4.2.1</span> Disposición de Fruchterman-Reingold</h4>
+<section id="graficado-en-base-a-atributo-de-nodo" class="level4" data-number="2.4.2.1">
+<h4 data-number="2.4.2.1" class="anchored" data-anchor-id="graficado-en-base-a-atributo-de-nodo"><span class="header-section-number">2.4.2.1</span> Graficado en base a atributo de nodo</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>layout <span class="ot">&lt;-</span> <span class="fu">layout_with_fr</span>(g)  <span class="co"># Fruchterman-Reingold layout</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">layout =</span> layout, <span class="at">vertex.color =</span> <span class="st">"skyblue"</span>, <span class="at">vertex.size =</span> <span class="dv">5</span>, <span class="at">edge.width =</span> <span class="fl">0.5</span>, <span class="at">main =</span> <span class="st">"Fruchterman-Reingold Layout"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Basic plot of the network</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.size=</span><span class="fu">degree</span>(g)<span class="sc">/</span><span class="dv">2</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.7</span>, <span class="at">vertex.label.cex=</span><span class="fl">0.8</span>, <span class="at">main=</span><span class="st">"Network by degree"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="disposición-circular" class="level4" data-number="2.4.2.2">
-<h4 data-number="2.4.2.2" class="anchored" data-anchor-id="disposición-circular"><span class="header-section-number">2.4.2.2</span> Disposición Circular</h4>
+<section id="disposición-de-fruchterman-reingold" class="level4" data-number="2.4.2.2">
+<h4 data-number="2.4.2.2" class="anchored" data-anchor-id="disposición-de-fruchterman-reingold"><span class="header-section-number">2.4.2.2</span> Disposición de Fruchterman-Reingold</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Help page access</span></span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>?layout_in_circle  <span class="co"># Recuerda cómo acceder a las páginas de ayuda</span></span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot with circular layout</span></span>
-<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>circular_layout <span class="ot">&lt;-</span> <span class="fu">layout_in_circle</span>(g)</span>
-<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">layout =</span> circular_layout, <span class="at">vertex.color =</span> <span class="st">"lightgreen"</span>, <span class="at">vertex.size =</span> <span class="dv">5</span>, <span class="at">edge.width =</span> <span class="fl">0.5</span>, <span class="at">main =</span> <span class="st">"Circular Layout"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>layout <span class="ot">&lt;-</span> <span class="fu">layout_with_fr</span>(g)  <span class="co"># Fruchterman-Reingold layout</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">layout =</span> layout, <span class="at">vertex.color =</span> <span class="st">"skyblue"</span>, <span class="at">vertex.size =</span> <span class="dv">5</span>, <span class="at">edge.width =</span> <span class="fl">0.5</span>, <span class="at">main =</span> <span class="st">"Fruchterman-Reingold Layout"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="disposición-nice" class="level4" data-number="2.4.2.3">
-<h4 data-number="2.4.2.3" class="anchored" data-anchor-id="disposición-nice"><span class="header-section-number">2.4.2.3</span> Disposición “nice”</h4>
+<section id="disposición-circular" class="level4" data-number="2.4.2.3">
+<h4 data-number="2.4.2.3" class="anchored" data-anchor-id="disposición-circular"><span class="header-section-number">2.4.2.3</span> Disposición Circular</h4>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot with nicely layout</span></span>
-<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>nice_layout <span class="ot">&lt;-</span> <span class="fu">layout_nicely</span>(g)</span>
-<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">layout =</span> nice_layout, <span class="at">vertex.color =</span> <span class="st">"orange"</span>, <span class="at">vertex.size =</span> <span class="dv">5</span>, <span class="at">edge.width =</span> <span class="fl">0.5</span>, <span class="at">main =</span> <span class="st">"Nicely Layout"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Help page access</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>?layout_in_circle  <span class="co"># Recuerda cómo acceder a las páginas de ayuda</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot with circular layout</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>circular_layout <span class="ot">&lt;-</span> <span class="fu">layout_in_circle</span>(g)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">layout =</span> circular_layout, <span class="at">vertex.color =</span> <span class="st">"lightgreen"</span>, <span class="at">vertex.size =</span> <span class="dv">5</span>, <span class="at">vertex.label.cex=</span><span class="fl">0.8</span>,<span class="at">edge.width =</span> <span class="fl">0.5</span>, <span class="at">main =</span> <span class="st">"Circular Layout"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="disposición-nice" class="level4" data-number="2.4.2.4">
+<h4 data-number="2.4.2.4" class="anchored" data-anchor-id="disposición-nice"><span class="header-section-number">2.4.2.4</span> Disposición “nice”</h4>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot with nicely layout</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>nice_layout <span class="ot">&lt;-</span> <span class="fu">layout_nicely</span>(g)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">layout =</span> nice_layout, <span class="at">vertex.color =</span> <span class="st">"orange"</span>, <span class="at">vertex.size =</span> <span class="dv">5</span>,<span class="at">vertex.label.cex=</span><span class="fl">0.8</span>, <span class="at">edge.width =</span> <span class="fl">0.5</span>, <span class="at">main =</span> <span class="st">"Nicely Layout"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>
@@ -490,7 +497,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h3 data-number="2.4.3" class="anchored" data-anchor-id="preguntas-3"><span class="header-section-number">2.4.3</span> Preguntas</h3>
 <p>¿Qué observas sobre la estructura de la red en diferentes disposiciones? ¿Hay áreas densamente conectadas?</p>
 <pre><code>Al observar la estructura de la red en diferentes disposiciones, es posible notar que la disposición afecta la manera en que percibimos la organización de los nodos y las conexiones. En algunas disposiciones, como la disposición en círculo o en rejilla, la estructura general es más clara, pero puede ser difícil identificar áreas con conexiones densas. En cambio, otras "visualizations" tienden a agrupar de manera más natural los nodos más conectados, haciendo que las áreas densamente conectadas se resalten visualmente. Estas áreas densas, conocidas como clusters, suelen estar formadas por grupos de genes que interactúan de manera más fuerte entre sí, lo que podría indicar que participan en procesos biológicos similares o relacionados.</code></pre>
-<p>¿Puedes identificar algunos hubs en la red? ¿Cuál podría ser su significado biológico?</p>
+<p>¿Puedes identificar algunos modulos en la red? ¿Cuál podría ser su significado biológico?</p>
 <pre><code>Sí, es posible identificar agrupaciones claras en la red, conocidas como clusters o módulos, que suelen estar formadas por nodos (genes) que están densamente interconectados entre sí. Estas agrupaciones pueden reflejar grupos de genes que participan en funciones biológicas comunes, como rutas metabólicas, procesos celulares específicos o complejos proteicos. Veremos mas sobre como identificar estos grupos la semana que viene.</code></pre>
 
 

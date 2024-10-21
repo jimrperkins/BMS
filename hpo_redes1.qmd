@@ -10,7 +10,7 @@ En este tutorial, exploraremos cómo obtener una lista de genes asociados con el
 4.  Visualizar la red y analizar sus propiedades.
 5.  Agrupar la red y visualizar los grupos.
 
-### Quick Reminder - Terminologia: 
+### Quick Reminder - Terminologia:
 
 Las **funciones** son bloques de código que realizan tareas específicas y pueden tomar **argumentos** como entrada para personalizar su comportamiento. Por ejemplo, la función `plot()` se utiliza para crear gráficos:
 
@@ -24,7 +24,6 @@ plot(x, y, main = "Gráfico de Ejemplo", xlab = "Eje X", ylab = "Eje Y")
 En este caso, `x` e `y` son vectores que contienen los datos, y `main`, `xlab` y `ylab` son argumentos que establecen el título y las etiquetas de los ejes.
 
 *Si quieres encontrar informacion y ayuda relacionada con una funcion, se puede usar el comando `?function_name`, por ejemplo `?plot` te proporcionara informacion acerca de los argumentos para el comando, lo que devuelve el comando, y daria ejemplos de su uso.*
-
 
 Los **objetos** son contenedores de datos que pueden ser vectores (secuencias de elementos del mismo tipo) o data frames (tablas con columnas de diferentes tipos de datos) o otras estructuras.
 
@@ -103,16 +102,17 @@ Respuesta: La función GET() realiza una solicitud HTTP para obtener datos de la
 
 ```         
 Respuesta: Utilizar una API permite obtener datos de manera automática, lo que puede ahorrar tiempo y reducir errores. Las API también suelen proporcionar datos actualizados y en un formato estructurado, lo que facilita su análisis.
-```         
+```
+
 *¿Cuáles podrían ser algunas limitaciones o desafíos de usar una API para la recuperación de datos?*
 
-```
+```         
 Respuesta: Algunas limitaciones pueden incluir la necesidad de una conexión a internet, la posibilidad de que la API tenga restricciones de uso o limitaciones en la cantidad de datos que se pueden solicitar a la vez. También puede haber problemas de compatibilidad si los datos devueltos por la API cambian.
 ```
 
 *¿Puedes encontrar una función que te diga cuántas filas hay en el objeto genes? ¿Qué representa este número? ¿Cómo se compara con los resultados del web de HPO?*
 
-```
+```         
 Respuesta: Para contar cuántas filas hay en el objeto genes, puedes usar la función nrow() en R. Esta función devuelve el número de filas de un marco de datos o de una matriz. Este número representa la cantidad de genes que se han asociado con el fenotipo de interés, en este caso, morfología anormal del corpúsculo renal. Cada fila en el objeto genes corresponde a un gen único relacionado con ese fenotipo. Debe ser igual que el numero encontrado por el Web.
 ```
 
@@ -154,19 +154,27 @@ head(interaction_network)
 
 *¿Qué significa la línea `string_db <- STRINGdb$new(version = "12", species = 9606, score_threshold = 400, input_directory = ""`)?*
 
-    Respuesta: Esta línea inicializa un nuevo objeto STRINGdb, configurando la versión de la base de datos a utilizar (en este caso, la versión 12), especificando el organismo (especie humana, cuyo código es 9606) y estableciendo un umbral de puntuación de 400 para las interacciones que se consideran relevantes. El parámetro input_directory se deja vacío porque no se están usando archivos de entrada locales.
+```         
+Respuesta: Esta línea inicializa un nuevo objeto STRINGdb, configurando la versión de la base de datos a utilizar (en este caso, la versión 12), especificando el organismo (especie humana, cuyo código es 9606) y estableciendo un umbral de puntuación de 400 para las interacciones que se consideran relevantes. El parámetro input_directory se deja vacío porque no se están usando archivos de entrada locales.
+```
 
 *¿Cuál es el propósito de la línea `string_ids <- string_db$mp(gene_ids)`?*
 
-    Respuesta: La función mp() convierte los identificadores de genes (en este caso, almacenados en gene_ids) a los identificadores de STRING. Esto es necesario porque los genes pueden tener diferentes identificadores en diferentes bases de datos, y mp() asegura que se utilicen los correctos en la base de datos STRING.
+```         
+Respuesta: La función mp() convierte los identificadores de genes (en este caso, almacenados en gene_ids) a los identificadores de STRING. Esto es necesario porque los genes pueden tener diferentes identificadores en diferentes bases de datos, y mp() asegura que se utilicen los correctos en la base de datos STRING.
+```
 
 *¿Por qué es importante establecer un `score_threshold` al inicializar STRINGdb?*
 
-    Respuesta: El score_threshold define el umbral mínimo de puntuación para las interacciones que se incluirán en la red. Interacciones con puntuaciones por debajo de este umbral serán excluidas, lo que ayuda a centrarse en las interacciones más relevantes y significativas y a reducir el ruido en los datos.
+```         
+Respuesta: El score_threshold define el umbral mínimo de puntuación para las interacciones que se incluirán en la red. Interacciones con puntuaciones por debajo de este umbral serán excluidas, lo que ayuda a centrarse en las interacciones más relevantes y significativas y a reducir el ruido en los datos.
+```
 
 *¿Cuántas filas hay en el objeto interaction_network? ¿Qué representa este número? ¿Qué pasaría si repetimos el ejercicio aumentando el `score_threshold`?*
 
-    Respuesta: Este número representa la cantidad de interacciones que se han obtenido entre los genes de la red. Cada fila en el objeto interaction_network corresponde a una interacción única entre dos genes, donde se especifican detalles sobre la relación entre ellos. Si aumentamos el score_threshold, la red resultante seria mas pequeño.
+```         
+Respuesta: Este número representa la cantidad de interacciones que se han obtenido entre los genes de la red. Cada fila en el objeto interaction_network corresponde a una interacción única entre dos genes, donde se especifican detalles sobre la relación entre ellos. Si aumentamos el score_threshold, la red resultante seria mas pequeño.
+```
 
 ### Explicación Adicional
 
@@ -260,20 +268,28 @@ cat("Closeness Centrality (first 5 nodos):", head(centrality_closeness, 5), "\n"
 Después de calcular estas propiedades, reflexiona sobre las siguientes preguntas:
 
 *¿Cuál es la importancia de crear una red no dirigido en el contexto de las interacciones génicas? Como hemos creado una red no dirigida?*
-  
-    En las redes biológicas, a menudo se utilizan redes no dirigidos porque la interacción entre genes no tiene una dirección específica, reflejando interacciones mutuas en lugar de influencias unidireccionales.
+
+```         
+En las redes biológicas, a menudo se utilizan redes no dirigidos porque la interacción entre genes no tiene una dirección específica, reflejando interacciones mutuas en lugar de influencias unidireccionales.
+```
 
 *¿Qué información proporcionan estas métricas sobre la red de interacción de genes?*
 
-    El número de nodos y aristas nos muestra cuántos genes y cuántas interacciones hay en la red, proporcionando una idea de su complejidad. El grado promedio indica cuántas conexiones tiene cada gen en promedio, lo que refleja cuán interconectados están los genes. La densidad nos informa sobre la proporción de conexiones posibles que realmente ocurren, y la centralidad identifica genes clave que podrían desempeñar roles críticos en la red
+```         
+El número de nodos y aristas nos muestra cuántos genes y cuántas interacciones hay en la red, proporcionando una idea de su complejidad. El grado promedio indica cuántas conexiones tiene cada gen en promedio, lo que refleja cuán interconectados están los genes. La densidad nos informa sobre la proporción de conexiones posibles que realmente ocurren, y la centralidad identifica genes clave que podrían desempeñar roles críticos en la red
+```
 
 *¿Hay nodos que se destacan por su grado o centralidad? ¿Cómo podría esto estar relacionado con sus funciones biológicas?*
 
-    Los nodos con mayor grado o centralidad suelen ser hubs dentro de la red, lo que significa que están muy conectados o son esenciales para la transmisión de información. En un contexto biológico, estos genes pueden estar implicados en funciones importantes o regulando varias vías. Si estos genes clave están relacionados con la morfología anormal del corpúsculo renal, podrían ser cruciales para entender las bases moleculares de esta enfermedad.
+```         
+Los nodos con mayor grado o centralidad suelen ser hubs dentro de la red, lo que significa que están muy conectados o son esenciales para la transmisión de información. En un contexto biológico, estos genes pueden estar implicados en funciones importantes o regulando varias vías. Si estos genes clave están relacionados con la morfología anormal del corpúsculo renal, podrían ser cruciales para entender las bases moleculares de esta enfermedad.
+```
 
 *¿Qué implicaciones podrían tener estas propiedades para entender la morfología anormal del corpúsculo renal?*
 
-    El análisis de estas propiedades te ayudará a desarrollar una comprensión más profunda de las interacciones en la red y su relevancia en contextos biológicos.
+```         
+El análisis de estas propiedades te ayudará a desarrollar una comprensión más profunda de las interacciones en la red y su relevancia en contextos biológicos.
+```
 
 ## Parte 4: Visualizando la Red
 
@@ -327,10 +343,13 @@ plot(g, layout = nice_layout, vertex.color = "orange", vertex.size = 5,vertex.la
 ### Preguntas
 
 ¿Qué observas sobre la estructura de la red en diferentes disposiciones? ¿Hay áreas densamente conectadas?
-    
-    Al observar la estructura de la red en diferentes disposiciones, es posible notar que la disposición afecta la manera en que percibimos la organización de los nodos y las conexiones. En algunas disposiciones, como la disposición en círculo o en rejilla, la estructura general es más clara, pero puede ser difícil identificar áreas con conexiones densas. En cambio, otras "visualizations" tienden a agrupar de manera más natural los nodos más conectados, haciendo que las áreas densamente conectadas se resalten visualmente. Estas áreas densas, conocidas como clusters, suelen estar formadas por grupos de genes que interactúan de manera más fuerte entre sí, lo que podría indicar que participan en procesos biológicos similares o relacionados.
-    
-¿Puedes identificar algunos hubs en la red? ¿Cuál podría ser su significado biológico?
 
-    Sí, es posible identificar agrupaciones claras en la red, conocidas como clusters o módulos, que suelen estar formadas por nodos (genes) que están densamente interconectados entre sí. Estas agrupaciones pueden reflejar grupos de genes que participan en funciones biológicas comunes, como rutas metabólicas, procesos celulares específicos o complejos proteicos. Veremos mas sobre como identificar estos grupos la semana que viene.
+```         
+Al observar la estructura de la red en diferentes disposiciones, es posible notar que la disposición afecta la manera en que percibimos la organización de los nodos y las conexiones. En algunas disposiciones, como la disposición en círculo o en rejilla, la estructura general es más clara, pero puede ser difícil identificar áreas con conexiones densas. En cambio, otras "visualizations" tienden a agrupar de manera más natural los nodos más conectados, haciendo que las áreas densamente conectadas se resalten visualmente. Estas áreas densas, conocidas como clusters, suelen estar formadas por grupos de genes que interactúan de manera más fuerte entre sí, lo que podría indicar que participan en procesos biológicos similares o relacionados.
+```
 
+¿Puedes identificar algunos modulos en la red? ¿Cuál podría ser su significado biológico?
+
+```         
+Sí, es posible identificar agrupaciones claras en la red, conocidas como clusters o módulos, que suelen estar formadas por nodos (genes) que están densamente interconectados entre sí. Estas agrupaciones pueden reflejar grupos de genes que participan en funciones biológicas comunes, como rutas metabólicas, procesos celulares específicos o complejos proteicos. Veremos mas sobre como identificar estos grupos la semana que viene.
+```
