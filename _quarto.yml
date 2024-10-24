@@ -11,6 +11,7 @@ book:
     - index.qmd
     - reintro_a_r.qmd
     - hpo_redes1.qmd
+    - hpo_redes2.qmd
     - summary.qmd
     - references.qmd
 
