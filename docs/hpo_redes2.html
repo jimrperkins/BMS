@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.5.45">
+<meta name="generator" content="quarto-1.5.57">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -231,7 +231,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </header>
 
 
-<p>En este práctico, nos enfocaremos en regenerar la red de interacción genética de la semana pasada utilizando STRINGdb. Luego, aplicaremos algoritmos de clustering para identificar grupos de genes altamente conectados. Posteriormente, realizaremos un análisis de sobre-representación utilizando clusterProfiler para interpretar los posibles roles biológicos de estos clusters. Finalmente, visualizaremos los resultados de enriquecimiento de manera clara y efectiva. Usaremos los genes asociados al fenotipo de morfología anormal del corpúsculo renal que obtuvimos en el práctico anterior.</p>
+<p>En este práctico, nos enfocaremos en regenerar la red de interacción genética de la semana pasada utilizando STRINGdb. Luego, aplicaremos algoritmos de clustering para identificar grupos de genes altamente conectados. Posteriormente, realizaremos un análisis de sobre-representación utilizando clusterProfiler para interpretar los posibles roles biológicos de estas comunidades. Finalmente, visualizaremos los resultados de enriquecimiento de manera clara y efectiva. Usaremos los genes asociados al fenotipo de morfología anormal del corpúsculo renal que obtuvimos en la práctica anterior.</p>
 <section id="parte-1-regenerando-la-red-de-interacción-recordatorio" class="level2" data-number="3.1">
 <h2 data-number="3.1" class="anchored" data-anchor-id="parte-1-regenerando-la-red-de-interacción-recordatorio"><span class="header-section-number">3.1</span> Parte 1: Regenerando la Red de Interacción (Recordatorio)</h2>
 <p>En esta sección, recordaremos cómo construir una red de interacción utilizando STRINGdb y convertirla a un formato que podamos usar con la librería igraph en R.</p>
@@ -273,46 +273,46 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <section id="preguntas-de-reflexión-recordatorios" class="level3" data-number="3.1.2">
 <h3 data-number="3.1.2" class="anchored" data-anchor-id="preguntas-de-reflexión-recordatorios"><span class="header-section-number">3.1.2</span> Preguntas de Reflexión (recordatorios)</h3>
 <p><em>¿Qué tipo de información proporciona STRINGdb sobre las interacciones entre genes?</em></p>
-<pre><code>STRINGdb proporciona una amplia gama de información sobre las interacciones entre genes y proteínas. Esto incluye interacciones físicas directas, como enlaces proteicos, e interacciones funcionales, donde las proteínas pueden estar involucradas en los mismos procesos biológicos sin interactuar físicamente. Las interacciones están respaldadas por diferentes tipos de evidencias, como datos experimentales, coexpresión, similitud de dominios, y estudios computacionales. Además, STRINGdb asigna un puntaje de confianza (confidence score) a cada interacción, lo que ayuda a evaluar la fiabilidad de la conexión entre los genes o proteínas en la red.</code></pre>
+<pre><code>STRINGdb proporciona una amplia gama de información sobre las interacciones entre genes y proteínas. Esto incluye interacciones físicas directas, como enlaces proteicos, e interacciones funcionales, donde las proteínas pueden estar involucradas en los mismos procesos biológicos sin interactuar físicamente. Las interacciones están respaldadas por diferentes tipos de evidencias, como datos experimentales, coexpresión, similitud de dominios, y estudios computacionales. Además, STRINGdb asigna una puntuación de confianza (confidence score) a cada interacción, lo que ayuda a evaluar la fiabilidad de la conexión entre los genes o proteínas en la red.</code></pre>
 <p><em>¿Por qué es importante establecer un umbral de puntuación (score_threshold) al obtener interacciones?</em></p>
-<pre><code>Respuesta: El umbral de puntuación (score_threshold) es crucial porque permite filtrar las interacciones según su grado de confianza o fiabilidad. STRINGdb asigna un puntaje a cada interacción basado en la calidad y cantidad de evidencia que respalda la relación entre los genes o proteínas. Un puntaje más alto indica una mayor confianza en la interacción. Al ajustar el umbral, se puede obtener una red más robusta y precisa, eliminando interacciones que podrían ser falsas o de baja confianza. Si el umbral es muy bajo, podrías obtener demasiadas interacciones espurias; si es demasiado alto, podrías perder conexiones importantes pero menos documentadas.</code></pre>
+<pre><code>El umbral de puntuación (score_threshold) es crucial porque permite filtrar las interacciones según su grado de confianza o fiabilidad. STRINGdb asigna un score a cada interacción basado en la calidad y cantidad de evidencia que respalda la relación entre los genes o proteínas. Un valor más alto indica una mayor confianza en la interacción. Al ajustar el umbral, se puede obtener una red más robusta y precisa, eliminando interacciones que podrían ser falsas o de baja confianza. Si el umbral es muy bajo, podrías obtener demasiadas interacciones espureas; si es demasiado alto, podrías perder conexiones importantes pero menos documentadas.</code></pre>
 <p><em>¿Cómo se relacionan las interacciones en la red con las funciones biológicas de los genes involucrados?</em></p>
-<pre><code>Las interacciones en la red pueden proporcionar información clave sobre las funciones biológicas de los genes involucrados. Genes que están conectados en una red suelen participar en procesos biológicos relacionados, como rutas metabólicas, señalización celular, o respuestas a estímulos. Las redes permiten identificar módulos o agrupaciones de genes que trabajan juntos, lo cual puede revelar nuevas funciones biológicas o ayudar a comprender mejor las rutas moleculares en las que participan. Al analizar estas interacciones, los investigadores pueden inferir funciones desconocidas para algunos genes basándose en los genes con los que están conectados en la red, un concepto conocido como "guilt by association".</code></pre>
+<pre><code>Las interacciones en la red pueden proporcionar información clave sobre las funciones biológicas de los genes involucrados. Genes que estén conectados en una red suelen participar en procesos biológicos relacionados, como rutas metabólicas, señalización celular, o respuestas a estímulos. Las redes permiten identificar módulos o agrupaciones de genes que trabajan juntos, lo cual puede revelar nuevas funciones biológicas o ayudar a comprender mejor las rutas moleculares en las que participan. Al analizar estas interacciones, los investigadores pueden inferir funciones desconocidas para algunos genes basándose en los genes con los que están conectados en la red, un concepto conocido como "guilt by association".</code></pre>
 </section>
 </section>
 <section id="parte-2-clustering-de-la-red-con-igraph" class="level2" data-number="3.2">
 <h2 data-number="3.2" class="anchored" data-anchor-id="parte-2-clustering-de-la-red-con-igraph"><span class="header-section-number">3.2</span> Parte 2: Clustering de la Red con igraph</h2>
 <section id="qué-es-el-clustering" class="level3" data-number="3.2.1">
 <h3 data-number="3.2.1" class="anchored" data-anchor-id="qué-es-el-clustering"><span class="header-section-number">3.2.1</span> ¿Qué es el clustering?</h3>
-<p>El clustering en redes es el proceso de identificar grupos de nodos (genes, en este caso) que están más densamente conectados entre sí que con otros nodos de la red. Este enfoque permite detectar módulos o clusters, que pueden representar vías de señalización o grupos funcionales de genes que operan juntos en procesos biológicos.</p>
+<p>El clustering en redes es el proceso de identificar grupos de nodos (genes, en este caso) que están más densamente conectados entre sí que con otros nodos de la red. Este enfoque permite detectar módulos o clusters, que pueden representar vías de señalización o grupos funcionales de genes que operan juntos.</p>
 </section>
 <section id="teoría-detrás-del-clustering" class="level3" data-number="3.2.2">
 <h3 data-number="3.2.2" class="anchored" data-anchor-id="teoría-detrás-del-clustering"><span class="header-section-number">3.2.2</span> Teoría Detrás del Clustering</h3>
 <section id="conceptos-fundamentales" class="level4" data-number="3.2.2.1">
 <h4 data-number="3.2.2.1" class="anchored" data-anchor-id="conceptos-fundamentales"><span class="header-section-number">3.2.2.1</span> Conceptos Fundamentales</h4>
 <ol type="1">
-<li><p>Teoría de Grafos: En el contexto de las redes, los grafos se componen de nodos (genes) y aristas (interacciones). Comprender la teoría de grafos es fundamental para interpretar las estructuras de las redes y cómo los nodos interactúan entre sí.</p></li>
+<li><p>Teoría de Grafos: En el contexto de las redes, los grafos se componen de nodos (genes) y aristas (interacciones).</p></li>
 <li><p>Centralidad (Centrality): La centralidad mide la importancia de un nodo dentro de la red. Hay varias formas de calcular la centralidad:</p>
 <ul>
 <li>Centralidad de Grado (Degree Centrality): Número de conexiones que tiene un nodo. Un alto grado puede indicar un nodo clave en la red.</li>
 <li>Centralidad de Intermediación (Betweenness Centrality): Indica cuántas veces un nodo actúa como un puente a lo largo de los caminos más cortos entre otros nodos. Los nodos con alta centralidad de intermediación pueden controlar la comunicación en la red.</li>
-<li>Centralidad de Cercanía (Closeness Centrality): Mide qué tan cerca está un nodo de todos los demás nodos en la red, lo que puede reflejar su capacidad para acceder rápidamente a información. Densidad de la Red:</li>
+<li>Centralidad de Cercanía (Closeness Centrality): Mide qué tan cerca está un nodo de todos los demás nodos en la red, lo que puede reflejar su capacidad para acceder rápidamente a información.</li>
 </ul></li>
 <li><p>Densidad (Network Density): Se refiere a la proporción de conexiones existentes en la red en comparación con el número máximo posible de conexiones. Una red densa puede indicar una alta interconexión entre nodos, lo cual es fundamental para la identificación de clusters.</p></li>
 <li><p>Modularidad (Modularity): La modularidad es una medida de la estructura de la red que indica la calidad de la división en módulos o clusters. Un clustering con alta modularidad tiene muchas conexiones dentro de los clusters y pocas entre ellos. La optimización de la modularidad es un objetivo común en muchos algoritmos de clustering.</p></li>
 <li><p>Caminos y Conectividad (Paths and Connectivity): La existencia de caminos cortos y la conectividad entre nodos son cruciales para el clustering. Los clusters suelen tener caminos más cortos entre sus nodos que con nodos externos, lo que refleja su cohesión.</p></li>
 </ol>
 </section>
-<section id="visualizing-these-concepts" class="level4" data-number="3.2.2.2">
-<h4 data-number="3.2.2.2" class="anchored" data-anchor-id="visualizing-these-concepts"><span class="header-section-number">3.2.2.2</span> Visualizing these concepts</h4>
-<p>To illustrate these concepts, we will use the <code>sample_islands</code> function of igraph to create a synthetic graph made of densely connected “islands” or clusters with sparse inter-cluster connections, Such networks are well-suited to demonstrate several important principles of graph theory and network analysis, including centrality, modularity, density, and connectivity. Here’s how it relates to each of the principles mentioned:</p>
+<section id="visualizando-los-conceptos" class="level4" data-number="3.2.2.2">
+<h4 data-number="3.2.2.2" class="anchored" data-anchor-id="visualizando-los-conceptos"><span class="header-section-number">3.2.2.2</span> Visualizando los conceptos</h4>
+<p>Para ilustrar estos conceptos, utilizaremos la función `<code>sample_islands</code> de igraph para crear un grafo sintético compuesto por “islas” o clústeres densamente conectados y parcialmente aislados. Este tipo de red es ideal para demostrar varios principios importantes de la teoría de grafos y el análisis de redes, incluyendo centralidad, modularidad, densidad y conectividad. A continuación, se explica cómo se relaciona con cada uno de estos principios:</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">"igraph"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) <span class="fu">install.packages</span>(<span class="st">"igraph"</span>)</span>
 <span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>
-Adjuntando el paquete: 'igraph'</code></pre>
+Attaching package: 'igraph'</code></pre>
 </div>
 <div class="cell-output cell-output-stderr">
 <pre><code>The following objects are masked from 'package:stats':
@@ -328,7 +328,7 @@ Adjuntando el paquete: 'igraph'</code></pre>
 <span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">sample_islands</span>(<span class="dv">3</span>, <span class="dv">30</span>, <span class="fl">0.9</span>, <span class="dv">10</span>)</span>
 <span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize the graph</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Network to illustrate important properties related to clustering"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Red de islas para mostrar propiedades relacionadas con el clustering"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -344,6 +344,14 @@ Adjuntando el paquete: 'igraph'</code></pre>
 <li>Intra-island: Nodes within islands are densely connected, showcasing high local density, short paths, and high modularity within clusters. These nodes have high degree and closeness centrality relative to their island.</li>
 <li>Inter-island: Nodes connecting different islands have high betweenness centrality since they serve as bridges between different communities. These nodes control information flow across the network.</li>
 <li>The sparsity of connections between islands demonstrates how low global density and longer inter-cluster paths create well-separated clusters, ideal for modularity-based clustering.</li>
+</ul>
+</section>
+<section id="cómo-la-red-de-sample_islands-demuestra-estos-principios" class="level4" data-number="3.2.2.4">
+<h4 data-number="3.2.2.4" class="anchored" data-anchor-id="cómo-la-red-de-sample_islands-demuestra-estos-principios"><span class="header-section-number">3.2.2.4</span> Cómo la Red de Sample_Islands Demuestra Estos Principios:</h4>
+<ul>
+<li><p>Intra-isla: Los nodos dentro de las islas están densamente conectados, mostrando una alta densidad local, caminos cortos y alta modularidad dentro de los clústeres. Estos nodos tienen una centralidad de grado y cercanía alta en relación con su propia isla.</p></li>
+<li><p>Inter-isla: Los nodos que conectan diferentes islas poseen una alta centralidad de intermediación, ya que funcionan como puentes entre diferentes comunidades. Estos nodos controlan el flujo de información a través de la red.</p></li>
+<li><p>La escasez de conexiones entre islas demuestra cómo una baja densidad global y caminos más largos entre clústeres crean clústeres bien separados, ideales para agrupamiento basado en modularidad.</p></li>
 </ul>
 </section>
 </section>
@@ -373,16 +381,14 @@ Adjuntando el paquete: 'igraph'</code></pre>
 </div>
 <p>En esta red, los nodos rojos representan el núcleo, un grupo densamente interconectado, mientras que los nodos azules representan la periferia, que tiene conexiones más dispersas. Esta estructura simula la organización biológica donde un grupo central de genes podría estar estrechamente vinculado funcionalmente, mientras que los genes periféricos podrían estar involucrados en funciones más especializadas o de soporte.</p>
 </section>
-<section id="algoritmos-de-clustering" class="level4" data-number="3.2.3.2">
-<h4 data-number="3.2.3.2" class="anchored" data-anchor-id="algoritmos-de-clustering"><span class="header-section-number">3.2.3.2</span> Algoritmos de Clustering</h4>
-<ol type="1">
-<li>Algoritmo de Louvain El algoritmo de Louvain optimiza la modularidad, agrupando nodos de manera que se maximicen las conexiones dentro de los clusters y se minimicen entre clusters. Este algoritmo es eficiente para redes grandes y suele identificar grandes clusters en el núcleo.</li>
-</ol>
+<section id="generación-de-una-red-tipo-barabásialbert" class="level4" data-number="3.2.3.2">
+<h4 data-number="3.2.3.2" class="anchored" data-anchor-id="generación-de-una-red-tipo-barabásialbert"><span class="header-section-number">3.2.3.2</span> Generación de una Red tipo Barabási–Albert</h4>
+<p>Vamos a generar una red que simule una red de tipo libre de escala. Esto es un modelo de red basado en “rich get richer” o de ventaja acumulativa. Los nodos con mayor grado tienen mayor probabilidad de generar nuevas conexiones que los de menor grado. La distribución del grado de los nodos sigue una ley de potencial.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clustering using the Louvain algorithm</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>cluster_louvain <span class="ot">&lt;-</span> <span class="fu">cluster_louvain</span>(g)</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cluster_louvain, g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Clustering with Louvain"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate a core-periphery network</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>g_ba <span class="ot">&lt;-</span> <span class="fu">sample_pa</span>(<span class="dv">100</span>, <span class="at">power =</span> <span class="fl">1.9</span>, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g_ba, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Core-periphery network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -391,17 +397,18 @@ Adjuntando el paquete: 'igraph'</code></pre>
 </div>
 </div>
 </div>
-<ul>
-<li>Observación: En redes core-periphery, Louvain puede identificar el núcleo como un único cluster grande, mientras que los nodos periféricos pueden agruparse en pequeños clusters dispersos.</li>
-</ul>
-<ol start="2" type="1">
-<li>Algoritmo de Girvan-Newman El algoritmo de Girvan-Newman se basa en la eliminación de aristas con alta centralidad de intermediación. Al eliminar las conexiones clave, divide la red en clusters más pequeños, lo que puede descomponer el núcleo en subclusters.</li>
+</section>
+<section id="algoritmos-de-clustering" class="level4" data-number="3.2.3.3">
+<h4 data-number="3.2.3.3" class="anchored" data-anchor-id="algoritmos-de-clustering"><span class="header-section-number">3.2.3.3</span> Algoritmos de Clustering</h4>
+<ol type="1">
+<li>Algoritmo de Louvain</li>
 </ol>
+<p>El algoritmo de Louvain optimiza la modularidad, agrupando nodos de manera que se maximicen las conexiones dentro de los clusters y se minimicen entre clusters. Este algoritmo es eficiente para redes grandes y suele identificar grandes clusters en el núcleo.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clustering using the Girvan-Newman algorithm</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>cluster_girvan_newman <span class="ot">&lt;-</span> <span class="fu">cluster_edge_betweenness</span>(g)</span>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clustering using the Louvain algorithm</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>cluster_louvain <span class="ot">&lt;-</span> <span class="fu">cluster_louvain</span>(g)</span>
 <span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cluster_girvan_newman, g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Clustering with Girvan-Newman"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cluster_louvain, g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Clustering with Louvain"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -411,20 +418,44 @@ Adjuntando el paquete: 'igraph'</code></pre>
 </div>
 </div>
 <ul>
-<li>Observación: Girvan-Newman es capaz de dividir el núcleo en múltiples clusters si encuentra aristas clave que actúan como puentes dentro del núcleo.</li>
+<li><p>Observación: En redes core-periphery, Louvain puede identificar el núcleo como un único cluster grande, mientras que los nodos periféricos pueden agruparse en pequeños clusters dispersos.</p></li>
+<li><p>Enfoque tipo agregativo no jerárquico.</p></li>
 </ul>
-<ol start="3" type="1">
-<li>Algoritmo de Infomap El algoritmo Infomap utiliza flujos de información para identificar clusters en la red. Al modelar cómo se transmite la información entre los nodos, Infomap puede identificar tanto clusters en el núcleo como en la periferia.</li>
+<ol start="2" type="1">
+<li>Algoritmo de Girvan-Newman</li>
 </ol>
+<p>El algoritmo de Girvan-Newman se basa en la eliminación de aristas con alta centralidad de intermediación. Al eliminar las conexiones clave (de alta centralidad de intermediación), divide la red en clusters más pequeños, lo que puede descomponer el núcleo en subclusters.Posee alto coste computacional, así que es mejor sólo para redes medianas o pequeñas.</p>
+<ul>
+<li>Enfoque jerárquico y divisivo.</li>
+</ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clustering using the Infomap algorithm</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>cluster_infomap <span class="ot">&lt;-</span> <span class="fu">cluster_infomap</span>(g)</span>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clustering using the Girvan-Newman algorithm</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>cluster_girvan_newman <span class="ot">&lt;-</span> <span class="fu">cluster_edge_betweenness</span>(g)</span>
 <span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cluster_infomap, g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Clustering with Infomap"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cluster_girvan_newman, g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Clustering with Girvan-Newman"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
 <p><img src="hpo_redes2_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li>Observación: Girvan-Newman es capaz de dividir las comunidades de manera solapante.</li>
+</ul>
+<ol start="3" type="1">
+<li>Algoritmo de Infomap El algoritmo Infomap utiliza flujos de información para identificar clusters en la red. Al modelar cómo se transmite la información entre los nodos, Infomap puede identificar tanto clusters en el núcleo como en la periferia. De gran escalabilidad para redes grandes.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clustering using the Infomap algorithm</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>cluster_infomap <span class="ot">&lt;-</span> <span class="fu">cluster_infomap</span>(g)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cluster_infomap, g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Clustering with Infomap"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="hpo_redes2_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
@@ -435,15 +466,15 @@ Adjuntando el paquete: 'igraph'</code></pre>
 <p>Reflexión sobre los Resultados Cada uno de estos algoritmos ofrece una interpretación diferente de la red con estructura core-periphery. Por ejemplo:</p>
 <ul>
 <li>Louvain tiende a identificar grandes clusters, pero puede pasar por alto subestructuras dentro del núcleo.</li>
-<li>Girvan-Newman descompone el núcleo en subclusters más pequeños al identificar aristas clave.</li>
+<li>Girvan-Newman es capaz de obtener clusters menores al jugar con el solapamiento.</li>
 <li>Infomap ofrece una visión única basada en los flujos de información a través de la red, detectando clusters tanto en el núcleo como en la periferia.</li>
 </ul>
 <p>El clustering en redes biológicas es una herramienta poderosa para identificar módulos funcionales y estructuras subyacentes. Sin embargo, como hemos visto con la red core-periphery, no existe un único algoritmo que funcione para todas las redes. Cada uno tiene sus ventajas y limitaciones, y la elección del algoritmo adecuado depende de la naturaleza de la red y de los objetivos del análisis.</p>
 </section>
-<section id="preguntas" class="level4" data-number="3.2.3.3">
-<h4 data-number="3.2.3.3" class="anchored" data-anchor-id="preguntas"><span class="header-section-number">3.2.3.3</span> Preguntas</h4>
+<section id="preguntas" class="level4" data-number="3.2.3.4">
+<h4 data-number="3.2.3.4" class="anchored" data-anchor-id="preguntas"><span class="header-section-number">3.2.3.4</span> Preguntas</h4>
 <p>¿Por qué es importante considerar la centralidad de intermediación (betweenness centrality) cuando analizamos redes biológicas?</p>
-<pre><code>Respuesta sugerida: La centralidad de intermediación indica cuántas veces un nodo actúa como un puente entre otros nodos a lo largo de los caminos más cortos. En redes biológicas, esto puede representar genes o proteínas clave que controlan la comunicación entre distintos módulos funcionales. Los nodos con alta centralidad de intermediación son esenciales para mantener la conectividad global de la red, y su eliminación podría fragmentar la red y aislar módulos, lo que puede tener implicaciones biológicas críticas.</code></pre>
+<pre><code>La centralidad de intermediación indica cuántas veces un nodo actúa como un puente entre otros nodos a lo largo de los caminos más cortos. En redes biológicas, esto puede representar genes o proteínas clave que controlan la comunicación entre distintos módulos funcionales. Los nodos con alta centralidad de intermediación son esenciales para mantener la conectividad global de la red, y su eliminación podría fragmentar la red y aislar módulos, lo que puede tener implicaciones biológicas críticas.</code></pre>
 <p>¿Qué diferencia hay entre la modularidad alta y baja en el clustering de redes, y cómo afecta la interpretación de los clusters?</p>
 <pre><code>Una modularidad alta indica que los nodos dentro de un cluster están muy interconectados, y hay pocas conexiones con nodos fuera del cluster. Esto sugiere que el cluster representa un grupo funcional cohesivo. Por el contrario, una modularidad baja sugiere que los clusters no están bien definidos, con muchas conexiones externas, lo que dificulta la interpretación biológica. Los clusters con alta modularidad suelen corresponder a módulos funcionales claros, mientras que una baja modularidad puede reflejar procesos difusos o redes ruidosas.</code></pre>
 <p>¿Qué ventajas ofrece set.seed() cuando se trabaja con redes aleatorias o algoritmos estocásticos en el análisis de redes, y en qué situaciones sería más útil?</p>
@@ -460,26 +491,26 @@ Adjuntando el paquete: 'igraph'</code></pre>
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-FEDE - ESTO IRA AL FINAL COLAPSADO PARA NUESTROS EJEMPLOS - LA IDEA ES QUE LOS ESTUDIANTES NO LES VE - ES EL CODIGO PARA EL PARTE PREVIA
+Caution
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
 <div id="callout-1" class="callout-1-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph_from_data_frame</span>(interaction_network, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>cluster_louvain <span class="ot">&lt;-</span> <span class="fu">cluster_louvain</span>(g)</span>
-<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cluster_louvain, g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Clustering with Louvain"</span>)</span>
-<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>cluster_girvan_newman <span class="ot">&lt;-</span> <span class="fu">cluster_edge_betweenness</span>(g)</span>
-<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cluster_girvan_newman, g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Clustering with Girvan-Newman"</span>)</span>
-<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>cluster_infomap <span class="ot">&lt;-</span> <span class="fu">cluster_infomap</span>(g)</span>
-<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
-<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cluster_infomap, g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Clustering with Infomap"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">graph_from_data_frame</span>(interaction_network, <span class="at">directed =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>cluster_louvain <span class="ot">&lt;-</span> <span class="fu">cluster_louvain</span>(g)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cluster_louvain, g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Clustering with Louvain"</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>cluster_girvan_newman <span class="ot">&lt;-</span> <span class="fu">cluster_edge_betweenness</span>(g)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cluster_girvan_newman, g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Clustering with Girvan-Newman"</span>)</span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>cluster_infomap <span class="ot">&lt;-</span> <span class="fu">cluster_infomap</span>(g)</span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(cluster_infomap, g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Clustering with Infomap"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </div>
