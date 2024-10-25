@@ -1,6 +1,6 @@
 # Práctica Redes 2: Clusterizacion y Enriquecimiento Funcional
 
-En este práctico, nos enfocaremos en regenerar la red de interacción genética de la semana pasada utilizando STRINGdb. Luego, aplicaremos algoritmos de clustering para identificar grupos de genes altamente conectados. Posteriormente, realizaremos un análisis de sobre-representación utilizando clusterProfiler para interpretar los posibles roles biológicos de estos clusters. Finalmente, visualizaremos los resultados de enriquecimiento de manera clara y efectiva. Usaremos los genes asociados al fenotipo de morfología anormal del corpúsculo renal que obtuvimos en el práctico anterior.
+En este práctico, nos enfocaremos en regenerar la red de interacción genética de la semana pasada utilizando STRINGdb. Luego, aplicaremos algoritmos de clustering para identificar grupos de genes altamente conectados. Posteriormente, realizaremos un análisis de sobre-representación utilizando clusterProfiler para interpretar los posibles roles biológicos de estas comunidades. Finalmente, visualizaremos los resultados de enriquecimiento de manera clara y efectiva. Usaremos los genes asociados al fenotipo de morfología anormal del corpúsculo renal que obtuvimos en la práctica anterior.
 
 ## Parte 1: Regenerando la Red de Interacción (Recordatorio)
 En esta sección, recordaremos cómo construir una red de interacción utilizando STRINGdb y convertirla a un formato que podamos usar con la librería igraph en R.
@@ -41,47 +41,47 @@ interaction_network$from <- string_ids$name[match(interaction_network$from, stri
 
 ```
 
+
 ### Preguntas de Reflexión (recordatorios)
 
 *¿Qué tipo de información proporciona STRINGdb sobre las interacciones entre genes?*
 
-    STRINGdb proporciona una amplia gama de información sobre las interacciones entre genes y proteínas. Esto incluye interacciones físicas directas, como enlaces proteicos, e interacciones funcionales, donde las proteínas pueden estar involucradas en los mismos procesos biológicos sin interactuar físicamente. Las interacciones están respaldadas por diferentes tipos de evidencias, como datos experimentales, coexpresión, similitud de dominios, y estudios computacionales. Además, STRINGdb asigna un puntaje de confianza (confidence score) a cada interacción, lo que ayuda a evaluar la fiabilidad de la conexión entre los genes o proteínas en la red.
+    STRINGdb proporciona una amplia gama de información sobre las interacciones entre genes y proteínas. Esto incluye interacciones físicas directas, como enlaces proteicos, e interacciones funcionales, donde las proteínas pueden estar involucradas en los mismos procesos biológicos sin interactuar físicamente. Las interacciones están respaldadas por diferentes tipos de evidencias, como datos experimentales, coexpresión, similitud de dominios, y estudios computacionales. Además, STRINGdb asigna una puntuación de confianza (confidence score) a cada interacción, lo que ayuda a evaluar la fiabilidad de la conexión entre los genes o proteínas en la red.
 
 *¿Por qué es importante establecer un umbral de puntuación (score_threshold) al obtener interacciones?*
 
-    Respuesta: El umbral de puntuación (score_threshold) es crucial porque permite filtrar las interacciones según su grado de confianza o fiabilidad. STRINGdb asigna un puntaje a cada interacción basado en la calidad y cantidad de evidencia que respalda la relación entre los genes o proteínas. Un puntaje más alto indica una mayor confianza en la interacción. Al ajustar el umbral, se puede obtener una red más robusta y precisa, eliminando interacciones que podrían ser falsas o de baja confianza. Si el umbral es muy bajo, podrías obtener demasiadas interacciones espurias; si es demasiado alto, podrías perder conexiones importantes pero menos documentadas.
+    El umbral de puntuación (score_threshold) es crucial porque permite filtrar las interacciones según su grado de confianza o fiabilidad. STRINGdb asigna un score a cada interacción basado en la calidad y cantidad de evidencia que respalda la relación entre los genes o proteínas. Un valor más alto indica una mayor confianza en la interacción. Al ajustar el umbral, se puede obtener una red más robusta y precisa, eliminando interacciones que podrían ser falsas o de baja confianza. Si el umbral es muy bajo, podrías obtener demasiadas interacciones espureas; si es demasiado alto, podrías perder conexiones importantes pero menos documentadas.
 
 *¿Cómo se relacionan las interacciones en la red con las funciones biológicas de los genes involucrados?*
 
-    Las interacciones en la red pueden proporcionar información clave sobre las funciones biológicas de los genes involucrados. Genes que están conectados en una red suelen participar en procesos biológicos relacionados, como rutas metabólicas, señalización celular, o respuestas a estímulos. Las redes permiten identificar módulos o agrupaciones de genes que trabajan juntos, lo cual puede revelar nuevas funciones biológicas o ayudar a comprender mejor las rutas moleculares en las que participan. Al analizar estas interacciones, los investigadores pueden inferir funciones desconocidas para algunos genes basándose en los genes con los que están conectados en la red, un concepto conocido como "guilt by association".
+    Las interacciones en la red pueden proporcionar información clave sobre las funciones biológicas de los genes involucrados. Genes que estén conectados en una red suelen participar en procesos biológicos relacionados, como rutas metabólicas, señalización celular, o respuestas a estímulos. Las redes permiten identificar módulos o agrupaciones de genes que trabajan juntos, lo cual puede revelar nuevas funciones biológicas o ayudar a comprender mejor las rutas moleculares en las que participan. Al analizar estas interacciones, los investigadores pueden inferir funciones desconocidas para algunos genes basándose en los genes con los que están conectados en la red, un concepto conocido como "guilt by association".
 
 ## Parte 2: Clustering de la Red con igraph
 
 ### ¿Qué es el clustering?
 
-El clustering en redes es el proceso de identificar grupos de nodos (genes, en este caso) que están más densamente conectados entre sí que con otros nodos de la red. Este enfoque permite detectar módulos o clusters, que pueden representar vías de señalización o grupos funcionales de genes que operan juntos en procesos biológicos.
+El clustering en redes es el proceso de identificar grupos de nodos (genes, en este caso) que están más densamente conectados entre sí que con otros nodos de la red. Este enfoque permite detectar módulos o clusters, que pueden representar vías de señalización o grupos funcionales de genes que operan juntos.
 
 ### Teoría Detrás del Clustering
 #### Conceptos Fundamentales
 
-1. Teoría de Grafos: En el contexto de las redes, los grafos se componen de nodos (genes) y aristas (interacciones). Comprender la teoría de grafos es fundamental para interpretar las estructuras de las redes y cómo los nodos interactúan entre sí.
+1. Teoría de Grafos: En el contexto de las redes, los grafos se componen de nodos (genes) y aristas (interacciones).
 
 2. Centralidad (Centrality): La centralidad mide la importancia de un nodo dentro de la red. Hay varias formas de calcular la centralidad:
 
     * Centralidad de Grado (Degree Centrality): Número de conexiones que tiene un nodo. Un alto grado puede indicar un nodo clave en la red.
     * Centralidad de Intermediación (Betweenness Centrality): Indica cuántas veces un nodo actúa como un puente a lo largo de los caminos más cortos entre otros nodos. Los nodos con alta centralidad de intermediación pueden controlar la comunicación en la red.
     * Centralidad de Cercanía (Closeness Centrality): Mide qué tan cerca está un nodo de todos los demás nodos en la red, lo que puede reflejar su capacidad para acceder rápidamente a información.
-Densidad de la Red:
-
+    
 3. Densidad (Network Density): Se refiere a la proporción de conexiones existentes en la red en comparación con el número máximo posible de conexiones. Una red densa puede indicar una alta interconexión entre nodos, lo cual es fundamental para la identificación de clusters.
 
 4. Modularidad (Modularity): La modularidad es una medida de la estructura de la red que indica la calidad de la división en módulos o clusters. Un clustering con alta modularidad tiene muchas conexiones dentro de los clusters y pocas entre ellos. La optimización de la modularidad es un objetivo común en muchos algoritmos de clustering.
 
 5. Caminos y Conectividad (Paths and Connectivity): La existencia de caminos cortos y la conectividad entre nodos son cruciales para el clustering. Los clusters suelen tener caminos más cortos entre sus nodos que con nodos externos, lo que refleja su cohesión.
 
-#### Visualizing these concepts
+#### Visualizando los conceptos
 
-To illustrate these concepts, we will use the `sample_islands` function of igraph to create a synthetic graph made of densely connected "islands" or clusters with sparse inter-cluster connections, Such networks are well-suited to demonstrate several important principles of graph theory and network analysis, including centrality, modularity, density, and connectivity. Here’s how it relates to each of the principles mentioned:
+Para ilustrar estos conceptos, utilizaremos la función ``sample_islands` de igraph para crear un grafo sintético compuesto por "islas" o clústeres densamente conectados y parcialmente aislados. Este tipo de red es ideal para demostrar varios principios importantes de la teoría de grafos y el análisis de redes, incluyendo centralidad, modularidad, densidad y conectividad. A continuación, se explica cómo se relaciona con cada uno de estos principios:
 
 
 ```{r}
@@ -92,7 +92,7 @@ library(igraph)
 g <- sample_islands(3, 30, 0.9, 10)
 
 # Visualize the graph
-plot(g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Network to illustrate important properties related to clustering")
+plot(g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Red de islas para mostrar propiedades relacionadas con el clustering")
 ```
 
 #### How the Sample_Islands Network Demonstrates These Principles:
@@ -100,6 +100,14 @@ plot(g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Network to il
 * Intra-island: Nodes within islands are densely connected, showcasing high local density, short paths, and high modularity within clusters. These nodes have high degree and closeness centrality relative to their island.
 * Inter-island: Nodes connecting different islands have high betweenness centrality since they serve as bridges between different communities. These nodes control information flow across the network.
 * The sparsity of connections between islands demonstrates how low global density and longer inter-cluster paths create well-separated clusters, ideal for modularity-based clustering.
+
+#### Cómo la Red de Sample_Islands Demuestra Estos Principios:
+
+* Intra-isla: Los nodos dentro de las islas están densamente conectados, mostrando una alta densidad local, caminos cortos y alta modularidad dentro de los clústeres. Estos nodos tienen una centralidad de grado y cercanía alta en relación con su propia isla.
+
+* Inter-isla: Los nodos que conectan diferentes islas poseen una alta centralidad de intermediación, ya que funcionan como puentes entre diferentes comunidades. Estos nodos controlan el flujo de información a través de la red.
+
+* La escasez de conexiones entre islas demuestra cómo una baja densidad global y caminos más largos entre clústeres crean clústeres bien separados, ideales para agrupamiento basado en modularidad.
 
 ### Distintos algoritmos para clusterizar una red
 
@@ -119,11 +127,22 @@ V(g)$color <- ifelse(1:vcount(g) %in% core_nodes, "red", "blue")  # Color nodes 
 set.seed(123)
 plot(g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Core-periphery network")
 ```
-
 En esta red, los nodos rojos representan el núcleo, un grupo densamente interconectado, mientras que los nodos azules representan la periferia, que tiene conexiones más dispersas. Esta estructura simula la organización biológica donde un grupo central de genes podría estar estrechamente vinculado funcionalmente, mientras que los genes periféricos podrían estar involucrados en funciones más especializadas o de soporte.
+
+#### Generación de una Red tipo Barabási–Albert
+
+Vamos a generar una red que simule una red de tipo libre de escala. Esto es un modelo de red basado en "rich get richer" o de ventaja acumulativa. Los nodos con mayor grado tienen mayor probabilidad de generar nuevas conexiones que los de menor grado. La distribución del grado de los nodos sigue una ley de potencial.
+
+```{r}
+# Generate a core-periphery network
+set.seed(123)
+g_ba <- sample_pa(100, power = 1.9, directed = FALSE)
+plot(g_ba, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Core-periphery network")
+```
 
 #### Algoritmos de Clustering
 1. Algoritmo de Louvain
+
 El algoritmo de Louvain optimiza la modularidad, agrupando nodos de manera que se maximicen las conexiones dentro de los clusters y se minimicen entre clusters. Este algoritmo es eficiente para redes grandes y suele identificar grandes clusters en el núcleo.
 
 ```{r}
@@ -135,8 +154,13 @@ plot(cluster_louvain, g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, ma
 
 * Observación: En redes core-periphery, Louvain puede identificar el núcleo como un único cluster grande, mientras que los nodos periféricos pueden agruparse en pequeños clusters dispersos.
 
+* Enfoque tipo agregativo no jerárquico.
+
 2. Algoritmo de Girvan-Newman
-El algoritmo de Girvan-Newman se basa en la eliminación de aristas con alta centralidad de intermediación. Al eliminar las conexiones clave, divide la red en clusters más pequeños, lo que puede descomponer el núcleo en subclusters.
+
+El algoritmo de Girvan-Newman se basa en la eliminación de aristas con alta centralidad de intermediación. Al eliminar las conexiones clave (de alta centralidad de intermediación), divide la red en clusters más pequeños, lo que puede descomponer el núcleo en subclusters.Posee alto coste computacional, así que es mejor sólo para redes medianas o pequeñas.
+
+* Enfoque jerárquico y divisivo.
 
 ```{r}
 # Clustering using the Girvan-Newman algorithm
@@ -145,10 +169,10 @@ set.seed(123)
 plot(cluster_girvan_newman, g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Clustering with Girvan-Newman")
 ```
 
-* Observación: Girvan-Newman es capaz de dividir el núcleo en múltiples clusters si encuentra aristas clave que actúan como puentes dentro del núcleo.
+* Observación: Girvan-Newman es capaz de dividir las comunidades de manera solapante.
 
 3. Algoritmo de Infomap
-El algoritmo Infomap utiliza flujos de información para identificar clusters en la red. Al modelar cómo se transmite la información entre los nodos, Infomap puede identificar tanto clusters en el núcleo como en la periferia.
+El algoritmo Infomap utiliza flujos de información para identificar clusters en la red. Al modelar cómo se transmite la información entre los nodos, Infomap puede identificar tanto clusters en el núcleo como en la periferia. De gran escalabilidad para redes grandes.
 
 ```{r}
 # Clustering using the Infomap algorithm
@@ -163,7 +187,7 @@ Reflexión sobre los Resultados
 Cada uno de estos algoritmos ofrece una interpretación diferente de la red con estructura core-periphery. Por ejemplo:
 
 * Louvain tiende a identificar grandes clusters, pero puede pasar por alto subestructuras dentro del núcleo.
-* Girvan-Newman descompone el núcleo en subclusters más pequeños al identificar aristas clave.
+* Girvan-Newman es capaz de obtener clusters menores al jugar con el solapamiento.
 * Infomap ofrece una visión única basada en los flujos de información a través de la red, detectando clusters tanto en el núcleo como en la periferia.
 
 El clustering en redes biológicas es una herramienta poderosa para identificar módulos funcionales y estructuras subyacentes. Sin embargo, como hemos visto con la red core-periphery, no existe un único algoritmo que funcione para todas las redes. Cada uno tiene sus ventajas y limitaciones, y la elección del algoritmo adecuado depende de la naturaleza de la red y de los objetivos del análisis.
@@ -172,7 +196,7 @@ El clustering en redes biológicas es una herramienta poderosa para identificar 
 
 ¿Por qué es importante considerar la centralidad de intermediación (betweenness centrality) cuando analizamos redes biológicas?
 
-    Respuesta sugerida: La centralidad de intermediación indica cuántas veces un nodo actúa como un puente entre otros nodos a lo largo de los caminos más cortos. En redes biológicas, esto puede representar genes o proteínas clave que controlan la comunicación entre distintos módulos funcionales. Los nodos con alta centralidad de intermediación son esenciales para mantener la conectividad global de la red, y su eliminación podría fragmentar la red y aislar módulos, lo que puede tener implicaciones biológicas críticas.
+    La centralidad de intermediación indica cuántas veces un nodo actúa como un puente entre otros nodos a lo largo de los caminos más cortos. En redes biológicas, esto puede representar genes o proteínas clave que controlan la comunicación entre distintos módulos funcionales. Los nodos con alta centralidad de intermediación son esenciales para mantener la conectividad global de la red, y su eliminación podría fragmentar la red y aislar módulos, lo que puede tener implicaciones biológicas críticas.
 
 ¿Qué diferencia hay entre la modularidad alta y baja en el clustering de redes, y cómo afecta la interpretación de los clusters?
 
@@ -189,8 +213,6 @@ Create a new chunk in your Rmd documents and write code to apply the three clust
 
 
 ::: {.callout-caution collapse="true"}
-### FEDE - ESTO IRA AL FINAL COLAPSADO PARA NUESTROS EJEMPLOS - LA IDEA ES QUE LOS ESTUDIANTES NO LES VE - ES EL CODIGO PARA EL PARTE PREVIA
-
 ```{r, eval=FALSE}
 g <- graph_from_data_frame(interaction_network, directed = FALSE)
 
