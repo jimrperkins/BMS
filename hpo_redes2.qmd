@@ -12,8 +12,8 @@ STRINGdb es una base de datos que proporciona información sobre interacciones e
 
 ```{r, eval=FALSE}
 # Load required packages
-if (!requireNamespace("igraph", quietly = TRUE)) install.packages("httr")
-if (!requireNamespace("igraph", quietly = TRUE)) install.packages("jsonlite")
+if (!requireNamespace("httr", quietly = TRUE)) install.packages("httr")
+if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("jsonlite")
 if (!requireNamespace("igraph", quietly = TRUE)) install.packages("igraph")
 if (!requireNamespace("STRINGdb", quietly = TRUE)) BiocManager::install("STRINGdb")
 
