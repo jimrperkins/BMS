@@ -258,7 +258,9 @@ Método: Se utiliza una prueba estadística (como la prueba exacta de Fisher) pa
 
 Propósito: Identificar conjuntos de genes que muestran una tendencia a ubicarse en las posiciones más altas o bajas en una lista ordenada de acuerdo a una variable continua, como el nivel de expresión.
 Método: En lugar de seleccionar un subconjunto específico de genes, GSEA evalúa el enriquecimiento en función de la posición en una lista clasificada, eliminando la necesidad de un umbral de significancia arbitrario.
-Selección del Método de Enriquecimiento
+
+**Selección del Método de Enriquecimiento**
+
 Cada método tiene sus ventajas y limitaciones. El ORA es útil cuando ya se ha definido un conjunto específico de genes de interés, mientras que GSEA es particularmente valioso en análisis exploratorios donde no se requiere un corte específico de significancia para definir los genes de interés. Elegir entre estos métodos depende del diseño del experimento y de la naturaleza de los datos.
 
 ### Enfoque Práctico: Análisis de Sobrerrepresentación (ORA)
