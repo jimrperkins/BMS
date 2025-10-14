@@ -52,6 +52,9 @@ Para usar la API, aquí hay un ejemplo de cómo obtener genes programáticamente
 
 ```{r, eval=FALSE}
 # Install necessary packages if not already installed
+Sys.setenv(CURL_SSL_BACKEND = "openssl") # Necessary step to reinstall curl for use in Windows
+install.packages("curl", force=TRUE, dependencies = TRUE)
+
 if (!requireNamespace("httr", quietly = TRUE)) {
   install.packages("httr")
 }
@@ -125,10 +128,12 @@ A través de la API de STRING, podemos obtener de manera programática una red d
 A continuación, aseguramos de que tienes el paquete STRINGdb instalado y luego procederemos a obtener la red de interacción.
 
 ```{R, eval=FALSE}
-
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
 # Install the STRINGdb package if not already installed
 if (!requireNamespace("STRINGdb", quietly = TRUE)) {
-  install.packages("STRINGdb")
+  BiocManager::install("STRINGdb", ask = FALSE, update = FALSE, type = "binary")
 }
 
 library(STRINGdb)
