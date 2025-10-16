@@ -12,9 +12,13 @@ STRINGdb es una base de datos que proporciona información sobre interacciones e
 
 ```{r, eval=FALSE}
 # Load required packages
+Sys.setenv(CURL_SSL_BACKEND = "openssl") # Necessary step to reinstall curl for use in Windows
+install.packages("curl", force=TRUE, dependencies = TRUE)
+
 if (!requireNamespace("httr", quietly = TRUE)) install.packages("httr")
 if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("jsonlite")
 if (!requireNamespace("igraph", quietly = TRUE)) install.packages("igraph")
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 if (!requireNamespace("STRINGdb", quietly = TRUE)) BiocManager::install("STRINGdb")
 
 library(httr)
