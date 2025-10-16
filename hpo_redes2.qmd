@@ -17,12 +17,11 @@ install.packages("curl", force=TRUE, dependencies = TRUE)
 
 if (!requireNamespace("httr", quietly = TRUE)) install.packages("httr")
 if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("jsonlite")
-if (!requireNamespace("igraph", quietly = TRUE)) install.packages("igraph")
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 if (!requireNamespace("STRINGdb", quietly = TRUE)) {
   BiocManager::install("STRINGdb", ask = FALSE, update = FALSE, type = "binary")
 }
-
+if (!requireNamespace("igraph", quietly = TRUE)) install.packages("igraph")
 
 library(httr)
 library(jsonlite)
@@ -117,7 +116,18 @@ plot(g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Red de islas 
 
 -   La escasez de conexiones entre islas demuestra cómo una baja densidad global y caminos más largos entre clústeres crean clústeres bien separados, ideales para agrupamiento basado en modularidad.
 
-### Distintos algoritmos para clusterizar una red
+#### Generación de una Red tipo Erdős-Rényi
+
+Ahora veremos otros tipos de grafos importantes en teoría de redes y biología de sistemas. Los grafos de Erdős-Rényi, propuestos por Paul Erdős y Alfréd Rényi en los años 50, fueron el primer modelo formal de redes aleatorias. Conectan pares de nodos al azar con una probabilidad fija.
+
+```{r, eval=FALSE}
+set.seed(123)
+g <- sample_gnp(50, p=0.05)
+
+# Visualize the network
+set.seed(123)
+plot(g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Erdős-Rényi network")
+```
 
 #### Generación de una Red con Estructura Core-Periphery
 
@@ -146,10 +156,10 @@ Vamos a generar una red que simule una red de tipo libre de escala. Esto es un m
 # Generate a core-periphery network
 set.seed(123)
 g_ba <- sample_pa(100, power = 1.9, directed = FALSE)
-plot(g_ba, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Core-periphery network")
+plot(g_ba, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Barabasi–Albert network")
 ```
 
-#### Algoritmos de Clustering
+###  Distintos algoritmos para clusterizar una red
 
 1.  Algoritmo de Louvain
 
