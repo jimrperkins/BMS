@@ -19,7 +19,10 @@ if (!requireNamespace("httr", quietly = TRUE)) install.packages("httr")
 if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("jsonlite")
 if (!requireNamespace("igraph", quietly = TRUE)) install.packages("igraph")
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
-if (!requireNamespace("STRINGdb", quietly = TRUE)) BiocManager::install("STRINGdb")
+if (!requireNamespace("STRINGdb", quietly = TRUE)) {
+  BiocManager::install("STRINGdb", ask = FALSE, update = FALSE, type = "binary")
+}
+
 
 library(httr)
 library(jsonlite)
