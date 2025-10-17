@@ -521,25 +521,26 @@ Caution
 <p>clusterProfiler ofrece la función enrichGO para realizar el análisis de enriquecimiento basado en términos de GO. Vamos a ejecutarlo sobre nuestros genes de interés.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"GenomeInfoDb"</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"clusterProfiler"</span>, <span class="at">ask =</span> <span class="cn">FALSE</span>, <span class="at">update =</span> <span class="cn">FALSE</span>, <span class="at">type =</span> <span class="st">"binary"</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"org.Hs.eg.db"</span>, <span class="at">ask =</span> <span class="cn">FALSE</span>, <span class="at">update =</span> <span class="cn">FALSE</span>, <span class="at">type =</span> <span class="st">"binary"</span>)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(clusterProfiler)</span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(org.Hs.eg.db) <span class="co"># Base de datos de genes humanos</span></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute ORA enrichment analysis</span></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>enrich_results <span class="ot">&lt;-</span> <span class="fu">enrichGO</span>(</span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">gene          =</span> genes<span class="sc">$</span>name,      <span class="co"># Set of genes of interest (from HPO in this case)</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">OrgDb         =</span> org.Hs.eg.db,        <span class="co"># Gene annotation database</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">keyType       =</span> <span class="st">"SYMBOL"</span>,            <span class="co"># Type of gene identification (here, gene symbols)</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">ont           =</span> <span class="st">"BP"</span>,                <span class="co"># Ontology (BP: biological processes)</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">pAdjustMethod =</span> <span class="st">"BH"</span>,                <span class="co"># Method for p-value adjustment</span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">pvalueCutoff  =</span> <span class="fl">0.05</span>,                <span class="co"># Significance threshold for p-value</span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">qvalueCutoff  =</span> <span class="fl">0.2</span>                  <span class="co"># Significance threshold for q-value</span></span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostrar resultados</span></span>
-<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(enrich_results)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"org.Hs.eg.db"</span>, <span class="at">ask =</span> <span class="cn">FALSE</span>, <span class="at">update =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"GO.db"</span>, <span class="at">ask =</span> <span class="cn">FALSE</span>, <span class="at">update =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"clusterProfiler"</span>, <span class="at">ask =</span> <span class="cn">FALSE</span>, <span class="at">update =</span> <span class="cn">FALSE</span>, <span class="at">type =</span> <span class="st">"binary"</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(clusterProfiler)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(org.Hs.eg.db) <span class="co"># Base de datos de genes humanos</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute ORA enrichment analysis</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>enrich_results <span class="ot">&lt;-</span> <span class="fu">enrichGO</span>(</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">gene          =</span> genes<span class="sc">$</span>name,      <span class="co"># Set of genes of interest (from HPO in this case)</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">OrgDb         =</span> org.Hs.eg.db,        <span class="co"># Gene annotation database</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">keyType       =</span> <span class="st">"SYMBOL"</span>,            <span class="co"># Type of gene identification (here, gene symbols)</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">ont           =</span> <span class="st">"BP"</span>,                <span class="co"># Ontology (BP: biological processes)</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">pAdjustMethod =</span> <span class="st">"BH"</span>,                <span class="co"># Method for p-value adjustment</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">pvalueCutoff  =</span> <span class="fl">0.05</span>,                <span class="co"># Significance threshold for p-value</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">qvalueCutoff  =</span> <span class="fl">0.2</span>                  <span class="co"># Significance threshold for q-value</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostrar resultados</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(enrich_results)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="explicación-de-argumentos-clave-en-enrichgo" class="level3" data-number="3.3.4">
