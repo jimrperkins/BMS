@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 # Práctica Redes 2: Clusterizacion y Enriquecimiento Funcional
 
 En este práctico, nos enfocaremos en regenerar la red de interacción genética de la semana pasada utilizando STRINGdb. Luego, aplicaremos algoritmos de clustering para identificar grupos de genes altamente conectados. Posteriormente, realizaremos un análisis de sobre-representación utilizando clusterProfiler para interpretar los posibles roles biológicos de estas comunidades. Finalmente, visualizaremos los resultados de enriquecimiento de manera clara y efectiva. Usaremos los genes asociados al fenotipo de morfología anormal del corpúsculo renal que obtuvimos en la práctica anterior.
@@ -484,3 +485,630 @@ emapplot: El emapplot visualiza las relaciones entre los términos de enriquecim
 
 Ahora consulta la página de ayuda para estas funciones y úsalas para graficar algunos de tus clusters.
 
+=======
+# Práctica Redes 2: Clusterizacion y Enriquecimiento Funcional
+
+En este práctico, nos enfocaremos en regenerar la red de interacción genética de la semana pasada utilizando STRINGdb. Luego, aplicaremos algoritmos de clustering para identificar grupos de genes altamente conectados. Posteriormente, realizaremos un análisis de sobre-representación utilizando clusterProfiler para interpretar los posibles roles biológicos de estas comunidades. Finalmente, visualizaremos los resultados de enriquecimiento de manera clara y efectiva. Usaremos los genes asociados al fenotipo de morfología anormal del corpúsculo renal que obtuvimos en la práctica anterior.
+
+## Parte 1: Regenerando la Red de Interacción (Recordatorio)
+
+En esta sección, recordaremos cómo construir una red de interacción utilizando STRINGdb y convertirla a un formato que podamos usar con la librería igraph en R.
+
+### ¿Qué es STRINGdb?
+
+STRINGdb es una base de datos que proporciona información sobre interacciones entre proteínas y genes, así como las evidencias que respaldan estas interacciones. Utiliza datos de diversas fuentes, incluyendo experimentos de laboratorio, datos de literatura y predicciones computacionales.
+
+```{r, eval=FALSE}
+# Load required packages
+Sys.setenv(CURL_SSL_BACKEND = "openssl") # Necessary step to reinstall curl for use in Windows
+install.packages("curl", force=TRUE, dependencies = TRUE)
+
+if (!requireNamespace("httr", quietly = TRUE)) install.packages("httr")
+if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("jsonlite")
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+if (!requireNamespace("STRINGdb", quietly = TRUE)) {
+  BiocManager::install("STRINGdb", ask = FALSE, update = FALSE, type = "binary")
+}
+if (!requireNamespace("igraph", quietly = TRUE)) install.packages("igraph")
+
+library(httr)
+library(jsonlite)
+library(igraph)
+library(STRINGdb)
+
+# API request to get genes associated with the HPO term for abnormal renal corpuscle morphology
+hpo_id <- "HP:0031263"  # HPO ID for abnormal renal corpuscle morphology
+url <- paste0("https://ontology.jax.org/api/network/annotation/", hpo_id)
+response <- GET(url)
+data <- content(response, as = "text", encoding = "UTF-8")
+genes <- fromJSON(data)$genes
+
+# Initialize STRINGdb
+# Can you see anything different here compared to the last practical?
+string_db <- STRINGdb$new(version = "12", species = 9606, score_threshold = 400, input_directory = "")
+string_ids <- string_db$map( genes, "name", removeUnmappedRows = TRUE )
+
+interaction_network <- string_db$get_interactions(string_ids$STRING_id)
+interaction_network <- unique(interaction_network[, 1:2]) # necessary step to remove duplicate interactions
+interaction_network$to <- string_ids$name[match(interaction_network$to, string_ids$STRING_id)]
+interaction_network$from <- string_ids$name[match(interaction_network$from, string_ids$STRING_id)]
+
+# How can I see how big the network is? How does it compare to last week?
+
+```
+
+### Preguntas de Reflexión (recordatorios)
+
+*¿Qué tipo de información proporciona STRINGdb sobre las interacciones entre genes?*
+
+```         
+STRINGdb proporciona una amplia gama de información sobre las interacciones entre genes y proteínas. Esto incluye interacciones físicas directas, como enlaces proteicos, e interacciones funcionales, donde las proteínas pueden estar involucradas en los mismos procesos biológicos sin interactuar físicamente. Las interacciones están respaldadas por diferentes tipos de evidencias, como datos experimentales, coexpresión, similitud de dominios, y estudios computacionales. Además, STRINGdb asigna una puntuación de confianza (confidence score) a cada interacción, lo que ayuda a evaluar la fiabilidad de la conexión entre los genes o proteínas en la red.
+```
+
+*¿Por qué es importante establecer un umbral de puntuación (score_threshold) al obtener interacciones?*
+
+```         
+El umbral de puntuación (score_threshold) es crucial porque permite filtrar las interacciones según su grado de confianza o fiabilidad. STRINGdb asigna un score a cada interacción basado en la calidad y cantidad de evidencia que respalda la relación entre los genes o proteínas. Un valor más alto indica una mayor confianza en la interacción. Al ajustar el umbral, se puede obtener una red más robusta y precisa, eliminando interacciones que podrían ser falsas o de baja confianza. Si el umbral es muy bajo, podrías obtener demasiadas interacciones espureas; si es demasiado alto, podrías perder conexiones importantes pero menos documentadas.
+```
+
+*¿Cómo se relacionan las interacciones en la red con las funciones biológicas de los genes involucrados?*
+
+```         
+Las interacciones en la red pueden proporcionar información clave sobre las funciones biológicas de los genes involucrados. Genes que estén conectados en una red suelen participar en procesos biológicos relacionados, como rutas metabólicas, señalización celular, o respuestas a estímulos. Las redes permiten identificar módulos o agrupaciones de genes que trabajan juntos, lo cual puede revelar nuevas funciones biológicas o ayudar a comprender mejor las rutas moleculares en las que participan. Al analizar estas interacciones, los investigadores pueden inferir funciones desconocidas para algunos genes basándose en los genes con los que están conectados en la red, un concepto conocido como "guilt by association".
+```
+
+## Parte 2: Clustering de la Red con igraph
+
+### ¿Qué es el clustering?
+
+El clustering en redes es el proceso de identificar grupos de nodos (genes, en este caso) que están más densamente conectados entre sí que con otros nodos de la red. Este enfoque permite detectar módulos o clusters, que pueden representar vías de señalización o grupos funcionales de genes que operan juntos.
+
+### Teoría Detrás del Clustering
+
+#### Conceptos Fundamentales
+
+1.  Teoría de Grafos: En el contexto de las redes, los grafos se componen de nodos (genes) y aristas (interacciones).
+
+2. Caminos y Conectividad (Paths and Connectivity):  
+  La existencia de caminos cortos y la conectividad entre nodos son cruciales para el clustering.  
+  Los clusters suelen tener caminos más cortos entre sus nodos que con nodos externos, lo que refleja su cohesión.
+  El largo de un camino se mide como el número de aristas (o la suma de pesos si es ponderado).  
+  La longitud mínima entre dos nodos \\(i\\) y \\(j\\) es la distancia:
+
+  $$
+  d(i,j) = \min_{\pi \in P(i,j)} \, |\pi|,
+  $$
+  donde \\(P(i,j)\\) es el conjunto de todos los caminos entre \\(i\\) y \\(j\\), y \\(|\pi|\\) es la longitud del camino \\(\pi\\).
+
+  La red se dice conexa si \\(d(i,j) < \infty\\) para todo par de nodos \\(i,j\\).  
+  En grafos no conexos, el conjunto de nodos se divide en componentes conexas.
+
+3. Centralidad (Centrality): La centralidad mide la importancia de un nodo dentro de la red. Hay varias formas de calcular la centralidad:
+
+- Centralidad de Grado (Degree Centrality):
+  Número de conexiones que tiene un nodo. Un alto grado puede indicar un nodo clave en la red.  
+  Para un nodo \\(v\\) en un grafo simple no dirigido:
+
+  $$
+  k(v) = \sum_{u \in V} a_{vu},
+  $$
+
+  donde \\(a_{vu}\\) es la entrada de la matriz de adyacencia (\\(a_{vu} = 1\\) si hay arista \\(v\text{--}u\\), y 0 si no).
+
+---
+
+- Centralidad de Intermediación (Betweenness Centrality):
+  Indica cuántas veces un nodo actúa como un puente a lo largo de los caminos más cortos entre otros nodos.  
+
+  Sea \\(\sigma_{st}\\) el número de caminos más cortos entre \\(s\\) y \\(t\\),  
+  y \\(\sigma_{st}(v)\\) cuántos pasan por \\(v\\):
+
+  $$
+  C_B(v) = \sum_{\substack{s \neq v \neq t \\ s \neq t}} 
+  \frac{\sigma_{st}(v)}{\sigma_{st}}.
+  $$
+
+---
+
+- Centralidad de Cercanía (Closeness Centrality): 
+  Mide qué tan cerca está un nodo de todos los demás nodos en la red, lo que puede reflejar su capacidad para acceder rápidamente a información.  
+
+  Con \\(d(v,t)\\) la distancia más corta entre \\(v\\) y \\(t\\):
+
+  $$
+  C_C(v) = \frac{n-1}{\sum_{t \neq v} d(v,t)}.
+  $$
+
+  En grafos desconectados se recomienda la centralidad armónica:
+
+  $$
+  C_H(v) = \sum_{t \neq v} \frac{1}{d(v,t)},
+  $$
+
+  con la convención \\(1/\infty = 0\\).
+
+4.  Densidad (Network Density): Se refiere a la proporción de conexiones existentes en la red en comparación con el número máximo posible de conexiones. Una red densa puede indicar una alta interconexión entre nodos, lo cual es fundamental para la identificación de clusters.
+
+5. Modularidad (Modularity):  La modularidad es una medida de la estructura de la red que indica la calidad de la división en módulos o clusters.  
+  Un clustering con alta modularidad tiene muchas conexiones dentro de los clusters y pocas entre ellos.  
+  La optimización de la modularidad es un objetivo común en muchos algoritmos de clustering.
+
+#### Visualizando los conceptos
+
+Para ilustrar estos conceptos, utilizaremos la función \``sample_islands` de igraph para crear un grafo sintético compuesto por "islas" o clústeres densamente conectados y parcialmente aislados. Este tipo de red es ideal para demostrar varios principios importantes de la teoría de grafos y el análisis de redes, incluyendo centralidad, modularidad, densidad y conectividad. A continuación, se explica cómo se relaciona con cada uno de estos principios:
+
+```{r, eval=FALSE}
+# Load required packages
+library(igraph)
+# Create a network to illustrate important principles
+g <- sample_islands(3, 30, 0.9, 10)
+
+# Visualize the graph
+plot(g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Red de islas para mostrar propiedades relacionadas con el clustering")
+```
+
+#### Cómo la Red de Sample_Islands Demuestra Estos Principios:
+
+-   Intra-isla: Los nodos dentro de las islas están densamente conectados, mostrando una alta densidad local, caminos cortos y alta modularidad dentro de los clústeres. Estos nodos tienen una centralidad de grado y cercanía alta en relación con su propia isla.
+
+-   Inter-isla: Los nodos que conectan diferentes islas poseen una alta centralidad de intermediación, ya que funcionan como puentes entre diferentes comunidades. Estos nodos controlan el flujo de información a través de la red.
+
+```{r, eval=FALSE}
+plot(g, vertex.size=degree(g)/2, edge.arrow.size=0.7, 
+     vertex.label=NA, main="Degree")
+
+plot(g, vertex.size=closeness(g)*2*10^3, edge.arrow.size=0.7, 
+     vertex.label=NA, main="Closeness")
+
+plot(g, vertex.size=betweenness(g)/30, edge.arrow.size=0.7, 
+     vertex.label=NA, main="Betweenness")
+```
+
+```{r, eval=FALSE}
+hist(degree(g), main="Degree", xlab="Grado", col="lightblue", border="white")
+hist(closeness(g), main="Closeness", xlab="Cercanía", col="lightgreen", border="white")
+hist(betweenness(g), main="Betweenness", xlab="Intermediación", col="salmon", border="white")
+```
+
+-   La escasez de conexiones entre islas demuestra cómo una baja densidad global y caminos más largos entre clústeres crean clústeres bien separados, ideales para agrupamiento basado en modularidad.
+
+#### Generación de una Red tipo Erdős-Rényi
+
+Ahora veremos otros tipos de grafos importantes en teoría de redes y biología de sistemas. Los grafos de Erdős-Rényi, propuestos por Paul Erdős y Alfréd Rényi en los años 50, fueron el primer modelo formal de redes aleatorias. Conectan pares de nodos al azar con una probabilidad fija.
+
+```{r, eval=FALSE}
+set.seed(123)
+g <- sample_gnp(50, p=0.05)
+
+# Visualize the network
+set.seed(123)
+plot(g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Erdős-Rényi network")
+```
+
+```{r, eval=FALSE}
+hist(degree(g), main="Degree", xlab="Grado", col="lightblue", border="white")
+hist(closeness(g), main="Closeness", xlab="Cercanía", col="lightgreen", border="white")
+hist(betweenness(g), main="Betweenness", xlab="Intermediación", col="salmon", border="white")
+```
+
+
+#### Generación de una Red con Estructura Core-Periphery
+
+Vamos a generar una red que simule una estructura core-periphery usando la librería igraph. Esta estructura nos permitirá ver cómo los diferentes algoritmos de clustering lidian con un núcleo denso de nodos interconectados y una periferia menos conectada.
+
+```{r, eval=FALSE}
+# Generate a core-periphery network
+set.seed(123)
+g <- sample_gnp(50, 0.05)  # Periphery: sparse network
+core_nodes <- sample(1:vcount(g), 10)  # Select core nodes
+g <- add_edges(g, combn(core_nodes, 2))  # Add dense connections in the core
+V(g)$color <- ifelse(1:vcount(g) %in% core_nodes, "red", "blue")  # Color nodes based on core or periphery
+
+# Visualize the network
+set.seed(123)
+plot(g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Core-periphery network")
+```
+
+En esta red, los nodos rojos representan el núcleo, un grupo densamente interconectado, mientras que los nodos azules representan la periferia, que tiene conexiones más dispersas. Esta estructura simula la organización biológica donde un grupo central de genes podría estar estrechamente vinculado funcionalmente, mientras que los genes periféricos podrían estar involucrados en funciones más especializadas o de soporte.
+
+#### Generación de una Red tipo Barabási--Albert
+
+Vamos a generar una red que simule una red de tipo libre de escala. Esto es un modelo de red basado en "rich get richer" o de ventaja acumulativa. Los nodos con mayor grado tienen mayor probabilidad de generar nuevas conexiones que los de menor grado. La distribución del grado de los nodos sigue una ley de potencial.
+
+```{r, eval=FALSE}
+# Generate a core-periphery network
+set.seed(123)
+g_ba <- sample_pa(100, power = 1.9, directed = FALSE)
+plot(g_ba, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Barabasi–Albert network")
+```
+
+```{r, eval=FALSE}
+hist(degree(g_ba), main="Degree", xlab="Grado", col="lightblue", border="white")
+hist(closeness(g_ba), main="Closeness", xlab="Cercanía", col="lightgreen", border="white")
+hist(betweenness(g_ba), main="Betweenness", xlab="Intermediación", col="salmon", border="white")
+```
+
+
+### Distintos algoritmos para clusterizar una red
+
+1.  Algoritmo de Louvain
+
+El algoritmo de Louvain optimiza la modularidad, agrupando nodos de manera que se maximicen las conexiones dentro de los clusters y se minimicen entre clusters. Este algoritmo es eficiente para redes grandes y suele identificar grandes clusters en el núcleo.
+
+```{r, eval=FALSE}
+# Clustering using the Louvain algorithm
+cluster_louvain <- cluster_louvain(g)
+set.seed(123)
+plot(cluster_louvain, g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Clustering with Louvain")
+```
+
+-   Observación: En redes core-periphery, Louvain puede identificar el núcleo como un único cluster grande, mientras que los nodos periféricos pueden agruparse en pequeños clusters dispersos.
+
+-   Enfoque tipo agregativo no jerárquico.
+
+2.  Algoritmo de Girvan-Newman
+
+El algoritmo de Girvan-Newman se basa en la eliminación de aristas con alta centralidad de intermediación. Al eliminar las conexiones clave (de alta centralidad de intermediación), divide la red en clusters más pequeños, lo que puede descomponer el núcleo en subclusters.Posee alto coste computacional, así que es mejor sólo para redes medianas o pequeñas.
+
+-   Enfoque jerárquico y divisivo.
+
+```{r, eval=FALSE}
+# Clustering using the Girvan-Newman algorithm
+cluster_girvan_newman <- cluster_edge_betweenness(g)
+set.seed(123)
+plot(cluster_girvan_newman, g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Clustering with Girvan-Newman")
+```
+
+
+3.  Algoritmo de Infomap El algoritmo Infomap utiliza flujos de información para identificar clusters en la red. Al modelar cómo se transmite la información entre los nodos, Infomap puede identificar tanto clusters en el núcleo como en la periferia. De gran escalabilidad para redes grandes.
+
+```{r, eval=FALSE}
+# Clustering using the Infomap algorithm
+cluster_infomap <- cluster_infomap(g)
+set.seed(123)
+plot(cluster_infomap, g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Clustering with Infomap")
+```
+
+-   Observación: Infomap es particularmente útil para identificar subestructuras ocultas dentro de redes complejas como las de core-periphery, donde el flujo de información entre nodos puede revelar clusters que otros algoritmos pasan por alto.
+
+Reflexión sobre los Resultados Cada uno de estos algoritmos ofrece una interpretación diferente de la red con estructura core-periphery. Por ejemplo:
+
+-   Louvain tiende a identificar grandes clusters, pero puede pasar por alto subestructuras dentro del núcleo.
+-   Girvan-Newman es capaz de obtener clusters menores.
+-   Infomap ofrece una visión única basada en los flujos de información a través de la red, detectando clusters tanto en el núcleo como en la periferia.
+
+El clustering en redes biológicas es una herramienta poderosa para identificar módulos funcionales y estructuras subyacentes. Sin embargo, como hemos visto con la red core-periphery, no existe un único algoritmo que funcione para todas las redes. Cada uno tiene sus ventajas y limitaciones, y la elección del algoritmo adecuado depende de la naturaleza de la red y de los objetivos del análisis.
+
+#### Preguntas
+
+*¿Por qué es importante considerar la centralidad de intermediación (betweenness centrality) cuando analizamos redes biológicas?*
+
+```         
+La centralidad de intermediación indica cuántas veces un nodo actúa como un puente entre otros nodos a lo largo de los caminos más cortos. En redes biológicas, esto puede representar genes o proteínas clave que controlan la comunicación entre distintos módulos funcionales. Los nodos con alta centralidad de intermediación son esenciales para mantener la conectividad global de la red, y su eliminación podría fragmentar la red y aislar módulos, lo que puede tener implicaciones biológicas críticas.
+```
+
+*¿Qué diferencia hay entre la modularidad alta y baja en el clustering de redes, y cómo afecta la interpretación de los clusters?*
+
+```         
+Una modularidad alta indica que los nodos dentro de un cluster están muy interconectados, y hay pocas conexiones con nodos fuera del cluster. Esto sugiere que el cluster representa un grupo funcional cohesivo. Por el contrario, una modularidad baja sugiere que los clusters no están bien definidos, con muchas conexiones externas, lo que dificulta la interpretación biológica. Los clusters con alta modularidad suelen corresponder a módulos funcionales claros, mientras que una baja modularidad puede reflejar procesos difusos o redes ruidosas.
+```
+
+*¿Qué ventajas ofrece set.seed() cuando se trabaja con redes aleatorias o algoritmos estocásticos en el análisis de redes, y en qué situaciones sería más útil?*
+
+```         
+El uso de set.seed() permite que los resultados de procesos aleatorios sean reproducibles. En el análisis de redes, donde a menudo se utilizan grafos aleatorios o algoritmos estocásticos, fijar una semilla garantiza que la misma red o resultado se obtenga en cada ejecución del código. Esto es especialmente útil cuando se documentan los resultados o cuando se quiere comparar entre diferentes configuraciones o pruebas. En situaciones de enseñanza o investigación, permite que todos los involucrados trabajen con la misma estructura de red, facilitando la comprensión y el análisis.
+```
+
+### Aplicando algoritmos a nuestra red
+
+#### Aplicación de distintos algoritmos
+
+Crea un nuevo bloque en tus documentos Rmd y escribe el código para aplicar los tres algoritmos de agrupamiento a la red de interacción que creamos al inicio de esta práctica. Es posible que necesites consultar tus notas de la [práctica anterior](hpo_redes1.html) para crear un objeto igraph a partir de un data.frame.
+
+::: {.callout-caution collapse="true"}
+```{r, eval=FALSE}
+g <- graph_from_data_frame(interaction_network, directed = FALSE)
+
+cluster_louvain <- cluster_louvain(g)
+set.seed(123)
+plot(cluster_louvain, g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Clustering with Louvain")
+
+cluster_girvan_newman <- cluster_edge_betweenness(g)
+set.seed(123)
+plot(cluster_girvan_newman, g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Clustering with Girvan-Newman")
+
+cluster_infomap <- cluster_infomap(g)
+set.seed(123)
+plot(cluster_infomap, g, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Clustering with Infomap")
+
+```
+:::
+
+#### Selección en base a métrica de calidad
+
+En primer lugar, comprobamos qué proporción de los nodos de la red quedan efectivamente asignados a comunidades con cada algoritmo. Vemos el porcentaje de nodos cubiertos:
+
+```{r, eval=FALSE}
+total_nodes <- c(
+Louvain = sum(sizes(cluster_louvain)),
+GirvanNewman = sum(sizes(cluster_girvan_newman)),
+Infomap = sum(sizes(cluster_infomap))
+)
+total_nodes <- 100*(total_nodes/gorder(g))
+total_nodes
+```
+
+En todos los casos el valor debería rondar el 100 %, lo que indica que la partición cubre la totalidad de la red.
+
+A continuación, calculamos la modularidad de cada partición, que mide la calidad de la división en comunidades (valores más altos indican que los nodos están más densamente conectados dentro de sus comunidades y menos conectados entre comunidades):
+
+```{r, eval=FALSE}
+mod_vals <- c(
+Louvain = modularity(g, membership(cluster_louvain)),
+GirvanNewman = modularity(g, membership(cluster_girvan_newman)),
+Infomap = modularity(g, membership(cluster_infomap))
+)
+mod_vals
+```
+Con estos resultados podemos comparar cuál de los tres algoritmos ofrece la partición con mayor modularidad. Ese algoritmo sería, en principio, el más adecuado para describir la estructura de comunidades en nuestra red.
+
+#### Filtrado
+
+Es importante mencionar que normalmente se suele incorporar un paso de filtrado de clusters como etapa intermedia. En esta etapa seleccionamos aquellas comunidades encontradas con propiedades interesantes. Bien
+a nivel de tamaño de su comunidad, alta conexión interna u otro tipo de métrica de calidad. 
+
+Por fines didácticos esta es una etapa que se muestra en la práctica pero que no tendremos en cuenta para los estudios de enriquecimiento. Sin embargo, es bueno que los estudiantes lo tengan en cuenta si deseasen hacer estudios más finos en algún futuro.
+
+```{r, eval=FALSE}
+hist(sizes(cluster_louvain),
+     breaks = seq(0, max(sizes(cluster_louvain))+2, by=2),
+     col = "lightblue", border = "white",
+     main = "Distribución de tamaños - Louvain",
+     xlab = "Tamaño de comunidad (nodos)", ylab = "Frecuencia")
+
+hist(sizes(cluster_girvan_newman),
+     breaks = seq(0, max(sizes(cluster_girvan_newman))+2, by=2),
+     col = "lightgreen", border = "white",
+     main = "Distribución de tamaños - Girvan–Newman",
+     xlab = "Tamaño de comunidad (nodos)", ylab = "Frecuencia")
+
+hist(sizes(cluster_infomap),
+     breaks = seq(0, max(sizes(cluster_infomap))+2, by=2),
+     col = "salmon", border = "white",
+     main = "Distribución de tamaños - Infomap",
+     xlab = "Tamaño de comunidad (nodos)", ylab = "Frecuencia")
+```
+
+## Functional Enrichment
+
+### Introducción al Análisis de Enriquecimiento Funcional
+
+El análisis de enriquecimiento funcional es un conjunto de técnicas bioinformáticas diseñadas para identificar características funcionales, rutas o procesos biológicos que están representados en exceso dentro de un conjunto de genes de interés. Estas técnicas son fundamentales para ayudar a los investigadores a interpretar grandes cantidades de datos genómicos y transcriptómicos al descubrir las funciones moleculares y procesos biológicos que son importantes en condiciones experimentales específicas, como enfermedades o tratamientos.
+
+Cuando se estudia un conjunto de genes, ya sea obtenido a partir de datos de expresión diferencial, variantes genéticas, o cualquier otra fuente, el análisis de enriquecimiento nos permite responder preguntas como: ¿Qué procesos biológicos están sobrerrepresentados en este conjunto de genes? o ¿Qué funciones moleculares pueden estar relacionadas con el fenotipo de interés?
+
+#### Tipos de Análisis de Enriquecimiento
+
+Existen diferentes enfoques para el análisis de enriquecimiento, cada uno de los cuales responde a distintas preguntas de investigación y métodos estadísticos. Los más comunes incluyen:
+
+1. Análisis de Sobrerrepresentación (Over-Representation Analysis, ORA):
+
+Propósito: Determinar si ciertas funciones biológicas (por ejemplo, términos de Gene Ontology (GO), rutas de KEGG) están sobrerrepresentadas en un conjunto de genes de interés en comparación con un conjunto de fondo o referencia.
+Método: Se utiliza una prueba estadística (como la prueba exacta de Fisher) para evaluar si la frecuencia observada de un término es mayor de lo esperado al azar en el conjunto de interés.
+
+2. Análisis de Enriquecimiento Basado en Rango (Gene Set Enrichment Analysis, GSEA):
+
+Propósito: Identificar conjuntos de genes que muestran una tendencia a ubicarse en las posiciones más altas o bajas en una lista ordenada de acuerdo a una variable continua, como el nivel de expresión.
+Método: En lugar de seleccionar un subconjunto específico de genes, GSEA evalúa el enriquecimiento en función de la posición en una lista clasificada, eliminando la necesidad de un umbral de significancia arbitrario.
+
+**Selección del Método de Enriquecimiento**
+
+Cada método tiene sus ventajas y limitaciones. El ORA es útil cuando ya se ha definido un conjunto específico de genes de interés, mientras que GSEA es particularmente valioso en análisis exploratorios donde no se requiere un corte específico de significancia para definir los genes de interés. Elegir entre estos métodos depende del diseño del experimento y de la naturaleza de los datos.
+
+### Enfoque Práctico: Análisis de Sobrerrepresentación (ORA)
+
+En esta práctica, aplicaremos el enfoque de Análisis de Sobrerrepresentación (ORA) para explorar la representación de términos de Gene Ontology (GO) y rutas moleculares en un conjunto específico de genes de interés. Optamos por ORA en lugar de otros métodos como el Análisis de Enriquecimiento Basado en Rango (GSEA) porque en este caso disponemos de un conjunto bien definido de genes, asociados con el fenotipo de "Morfología Anormal del Corpúsculo Renal" en el Human Phenotype Ontology (HPO). Para aplicar GSEA, se requiere una lista completa de genes clasificados y un puntaje asociado a cada gen, lo cual no es aplicable en este escenario.
+
+Con ORA, podremos determinar si ciertos procesos biológicos o rutas están sobrerrepresentados en este conjunto específico de genes en comparación con un fondo de referencia. Utilizaremos el paquete clusterProfiler en R para realizar este análisis y visualizar los resultados, descubriendo los procesos biológicos relevantes que podrían estar implicados en la estructura y función del corpúsculo renal en condiciones anormales.
+
+#### Teoría del Análisis de Sobrerrepresentación (Over-Representation Analysis, ORA)
+
+Análisis de Sobrerrepresentación (ORA) es una técnica estadística que se utiliza para determinar si ciertos términos funcionales (por ejemplo, categorías de Gene Ontology (GO) o rutas de KEGG) están sobrerrepresentados en un conjunto de genes de interés en comparación con un conjunto de genes de fondo. Este tipo de análisis se usa comúnmente para identificar procesos biológicos o rutas moleculares relevantes a partir de datos de expresión diferencial, redes génicas, o cualquier otro conjunto de genes.
+
+#### Conceptos Básicos del ORA
+
+* Conjunto de Genes de Interés: Este conjunto contiene los genes seleccionados para el análisis. En el contexto de una enfermedad o condición, puede incluir genes diferencialmente expresados o genes relacionados con un fenotipo específico.
+
+* Conjunto de Fondo (Background): Para comparar la frecuencia de los términos en el conjunto de interés, necesitamos definir un grupo de genes de referencia o fondo, que suele ser el conjunto de todos los genes expresados en el experimento o todos los genes de un organismo.
+
+* Pruebas Estadísticas: ORA generalmente utiliza pruebas estadísticas como la prueba exacta de Fisher o la prueba de Chi-cuadrado para determinar si la frecuencia de un término funcional es mayor de lo esperado al azar en el conjunto de interés. La prueba estadística proporciona un valor de p, que puede ajustarse para el control de descubrimientos falsos.
+
+* Pasos para Realizar un ORA
+
+    1. Definir el conjunto de genes de interés y el conjunto de fondo.
+    2. Mapear los genes a términos funcionales (por ejemplo, a términos de GO o rutas de KEGG).
+    3. Calcular la frecuencia de cada término en ambos conjuntos y aplicar una prueba estadística para evaluar la significancia.
+    4. Interpretar los resultados, teniendo en cuenta el contexto biológico y el ajuste de p-valores.
+
+### ORA aplicado a Genes Asociados con el Término HPO "Morfología Anormal del Corpúsculo Renal"
+
+Vamos a realizar un análisis ORA usando el paquete clusterProfiler en R. Para ilustrar el procedimiento, consideraremos genes asociados con el término del Human Phenotype Ontology (HPO) "Morfología Anormal del Corpúsculo Renal" (abnormal renal corpuscle morphology). Este análisis identificará procesos o rutas biológicas que están sobrerrepresentados en este grupo de genes.
+
+clusterProfiler ofrece la función enrichGO para realizar el análisis de enriquecimiento basado en términos de GO. Vamos a ejecutarlo sobre nuestros genes de interés.
+
+```{r, eval=FALSE}
+BiocManager::install("GenomeInfoDb")
+BiocManager::install("org.Hs.eg.db", ask = FALSE, update = FALSE)
+BiocManager::install("GO.db", ask = FALSE, update = FALSE)
+BiocManager::install("clusterProfiler", ask = FALSE, update = FALSE, type = "binary")
+
+library(clusterProfiler)
+library(org.Hs.eg.db) # Base de datos de genes humanos
+
+# Execute ORA enrichment analysis
+enrich_results <- enrichGO(
+  gene          = genes$name,      # Set of genes of interest (from HPO in this case)
+  OrgDb         = org.Hs.eg.db,        # Gene annotation database
+  keyType       = "SYMBOL",            # Type of gene identification (here, gene symbols)
+  ont           = "BP",                # Ontology (BP: biological processes)
+  pAdjustMethod = "BH",                # Method for p-value adjustment
+  pvalueCutoff  = 0.05,                # Significance threshold for p-value
+  qvalueCutoff  = 0.2                  # Significance threshold for q-value
+)
+
+# Mostrar resultados
+head(enrich_results)
+```
+
+
+### Explicación de Argumentos Clave en enrichGO
+* gene: La lista de genes de interés. En este caso, es una lista de genes asociados con el fenotipo del HPO.
+* OrgDb: Base de datos que contiene la información de anotación de genes (en este caso, org.Hs.eg.db para genes humanos).
+* keyType: Tipo de identificación de los genes (por ejemplo, "SYMBOL" para nombres de genes, "ENTREZID" para IDs de Entrez).
+* ont: Especifica la ontología GO (BP: Biological Process, MF: Molecular Function, CC: Cellular Component).
+* pAdjustMethod: Método para ajustar los valores de p, siendo "BH" (Benjamini-Hochberg) una elección común.
+* pvalueCutoff y qvalueCutoff: Define los umbrales de significancia para p-valores y q-valores.
+
+::: {.callout-caution collapse="true"}
+### P and Q values
+El valor p y el valor q son métricas utilizadas en pruebas estadísticas para evaluar la significancia de los resultados, aunque tienen propósitos ligeramente diferentes:
+
+* Valor p: Representa la probabilidad de que los resultados observados (o más extremos) ocurran por azar si no hubiera un efecto real. En el contexto de análisis de enriquecimiento, un valor p bajo indica que un término o vía específica probablemente esté enriquecido en el conjunto de genes debido a una asociación verdadera y no al azar. Sin embargo, cuando se prueban múltiples hipótesis (como en un análisis de enriquecimiento con muchos términos), el uso de valores p sin ajuste puede llevar a una alta tasa de falsos positivos.
+
+* Valor q: Es una forma ajustada del valor p que se enfoca en controlar la tasa de descubrimientos falsos (FDR), o sea, la proporción esperada de falsos positivos entre todos los resultados positivos. El valor q considera las múltiples comparaciones y es especialmente útil en análisis de enriquecimiento, donde se prueban muchos términos. Un umbral de valor q (como q < 0.2) ayuda a limitar el porcentaje de descubrimientos falsos, y es una forma más conservadora de interpretar resultados con muchas pruebas.
+
+En resumen:
+
+* Valor p es la medida de significancia estadística sin ajuste.
+* Valor q es el valor p ajustado para controlar la tasa de descubrimientos falsos, proporcionando una estimación más confiable de la significancia en pruebas de gran escala.
+    
+#### Pregunta de reflexión:
+
+*¿Por qué es importante considerar tanto el valor p como el valor q al interpretar los resultados de un análisis de enriquecimiento?*
+
+    El valor p nos da una medida de la significancia estadística de los resultados, indicando qué tan probable es que un término esté enriquecido debido a una asociación verdadera y no al azar. Sin embargo, en análisis de enriquecimiento, donde se evalúan múltiples términos de manera simultánea, el valor p sin ajustar podría conducir a una alta tasa de falsos positivos. Por ello, el valor q es crucial, ya que ajusta el valor p para controlar la tasa de descubrimientos falsos (FDR), proporcionando una interpretación más confiable y conservadora de los resultados. Usar ambos valores ayuda a evitar conclusiones erróneas y a identificar términos que tienen una relevancia más sólida en el contexto del análisis.
+:::
+
+### Visualización de los Resultados de Enriquecimiento
+clusterProfiler permite visualizar términos GO enriquecidos con dotplot y barplot.
+
+```{r, eval=FALSE}
+if (!requireNamespace("enrichplot", quietly = TRUE)) BiocManager::install("enrichplot")
+library(enrichplot)
+
+# Dotplot to visualize enriched GO terms
+dotplot(enrich_results, showCategory = 10, title = "GO Enrichment for Abnormal Renal Corpuscle Morphology")
+
+# Barplot as an alternative
+barplot(enrich_results, showCategory = 10, title = "GO Enrichment Barplot")
+```
+
+#### También podemos exportar los resultados a CSV o visualizarlos en tablas.
+
+```{r, eval=FALSE}
+# Convert results to data frame and export to CSV
+setwd(file.path("C:","Users", "Usuario_UMA", "Desktop")) # Change folder so we write everything to Desktop
+write.csv2(as.data.frame(enrich_results), file = "GO_Enrichment_Abnormal_Renal_Corpuscle.csv", row.names = FALSE)
+
+# View as a table in R
+head(as.data.frame(enrich_results))
+```
+  
+### Análisis de Enriquecimiento en Clusters de una Red
+Cuando trabajamos con redes de genes, el análisis de enriquecimiento funcional puede aplicarse a clusters individuales para identificar funciones únicas en cada grupo de genes.
+
+Para realizar un Análisis de Enriquecimiento en Clusters de una Red en R, partiremos tambien de la red STRINGdb del termino HPO "abnormal renal corpuscle morphology" que ya ha sido agrupada en diferentes clusters (por ejemplo, usando el algoritmo de Louvain en una sección previa). Esto permite aplicar análisis de enriquecimiento a cada uno de los clusters obtenidos para identificar funciones biológicas o rutas moleculares específicas asociadas con cada grupo de genes.
+
+#### Extracción de Genes de Clusters para Análisis de Enriquecimiento
+
+* Asignación de Clusters a los Nodos: Partimos de un grafo en el que cada nodo ya tiene asignado un número de cluster.
+* Extracción de Genes por Cluster: Utilizamos una función para extraer los genes de cada cluster.
+
+El siguiente código ilustra cómo extraer los genes de cada cluster en el grafo previamente agrupado del termino HPO.
+
+```{r, eval=FALSE}
+# Create the graph
+g <- graph_from_data_frame(interaction_network, directed = FALSE)
+cluster_louvain <- cluster_louvain(g)
+set.seed(123)
+
+cluster_membership <- membership(cluster_louvain(g)) # Louvain clustering on the graph
+# Split genes by cluster
+genes_clusters <- split(V(g)$name, cluster_membership)  # Names of genes by cluster
+
+# Look at the genes in each cluster. What pathways/GO terms do you think might be enriched?
+print(genes_clusters)
+```
+
+#### Aplicación del Análisis de Enriquecimiento ORA en Cada Cluster
+
+Con los genes divididos por clusters, aplicaremos el análisis de enriquecimiento Over-Representation Analysis (ORA) en cada uno. Esto permite identificar procesos biológicos o funciones moleculares específicas para los genes de cada grupo. Usaremos el paquete clusterProfiler y nos enfocaremos en el análisis de enriquecimiento GO.
+
+
+```{r, eval=FALSE}
+# Initialize an empty list to store enrichment results for each cluster
+enrichment_results_clusters <- list()
+
+# Loop over each cluster to perform enrichment analysis
+for (i in seq_along(genes_clusters)) {
+  cat(i, "\n")
+  # Perform GO enrichment for the current cluster
+  enrichment_results_clusters[[i]] <- enrichGO(
+    gene          = genes_clusters[[i]],   # Set of genes for the current cluster
+    OrgDb         = org.Hs.eg.db,          # Database for gene annotation
+    keyType       = "SYMBOL",              # Identifier type (e.g., gene symbols)
+    ont           = "BP",                  # Ontology (BP: Biological Process)
+    pAdjustMethod = "BH",                  # Method for p-value adjustment
+    pvalueCutoff  = 0.05,                  # Significance threshold for p-value
+    qvalueCutoff  = 0.2                    # Significance threshold for q-value
+  )
+}
+
+# Visualize results for the first cluster as an example
+dotplot(enrichment_results_clusters[[1]], showCategory = 10, title = "GO Enrichment for Cluster 1")
+
+# Save enrichment results to CSV files for each cluster
+for (i in seq_along(enrichment_results_clusters)) {
+  write.csv2(
+    as.data.frame(enrichment_results_clusters[[i]]),  # Convert to data frame for saving
+    file = paste0("enrichment_cluster_", i, ".csv")   # File name based on cluster index
+  )
+}
+```
+
+Ahora utiliza un dotplot para visualizar los resultados de los primeros, terceros y cuartos clusters. ¿Cómo se comparan los resultados con la intuición formada al mirar las listas de genes?
+
+#### Preguntas
+
+*¿Por qué es importante el análisis de enriquecimiento funcional?*
+    El análisis de enriquecimiento funcional es fundamental en bioinformática porque permite a los investigadores identificar patrones significativos dentro de grandes conjuntos de datos genómicos y transcriptómicos. Al revelar qué procesos biológicos, rutas o funciones moleculares están sobrerrepresentados en un conjunto de genes, facilita la interpretación de los resultados experimentales. Esto es esencial para formular hipótesis sobre la biología subyacente de enfermedades o tratamientos y para priorizar futuras investigaciones.
+
+*¿Cómo deberíamos interpretar los resultados del análisis de enriquecimiento?*
+
+    La interpretación de los términos enriquecidos depende del contexto biológico de los genes de interés. Por ejemplo, si los genes seleccionados están asociados con una enfermedad renal, los términos enriquecidos relacionados con funciones como la apoptosis o la inflamación pueden indicar procesos relevantes en la patología. Comprender el contexto ayuda a filtrar los resultados y a dirigir la investigación hacia áreas biológicamente significativas.
+
+*¿Por qué son importantes las visualizaciones de datos para el análisis de enriquecimiento?*
+
+    Las visualizaciones, como los dotplots y emapplots, son esenciales para comprender y comunicar los resultados del análisis de enriquecimiento. Estas herramientas permiten a los investigadores identificar rápidamente patrones, relaciones y la relevancia de diferentes términos enriquecidos en el contexto de su conjunto de genes. La visualización facilita destacar hallazgos clave y presentar los resultados de manera más accesible, fomentando colaboraciones y discusiones entre investigadores.
+
+*¿Qué conocimientos se pueden obtener al realizar un análisis de enriquecimiento en clusters de una red?*
+    
+    Realizar un análisis de enriquecimiento en clusters de una red puede revelar diferencias significativas en los términos enriquecidos a lo largo de grupos de genes. Por ejemplo, un cluster que agrupa genes involucrados en la respuesta inmune puede mostrar un enriquecimiento en términos relacionados con la inflamación, mientras que otro cluster puede estar enriquecido en términos relacionados con la regulación del ciclo celular. Estas diferencias ofrecen una visión de cómo diferentes grupos de genes contribuyen a procesos biológicos específicos, ayudando a delimitar funciones y relaciones dentro de la red.
+
+*¿Cómo informan los resultados de enriquecimiento sobre la relación entre genes y fenotipo?*
+
+    Los resultados del análisis de enriquecimiento pueden proporcionar información sobre la relación entre los genes analizados y el fenotipo de interés, como la morfología anormal del corpúsculo renal. Si los términos enriquecidos sugieren una disfunción en procesos como la filtración o la regulación del crecimiento celular, esto puede implicar mecanismos biológicos subyacentes al fenotipo observado. Este conocimiento es valioso para comprender mejor la biología de la enfermedad y potencialmente guiar investigaciones futuras hacia objetivos terapéuticos.
+
+*¿Cuáles son algunas aplicaciones prácticas del análisis de enriquecimiento?*
+    
+    El análisis de enriquecimiento tiene muchas aplicaciones prácticas, como el desarrollo de tratamientos y la comprensión de enfermedades. Por ejemplo, identificar rutas biológicas alteradas en un tipo específico de cáncer puede ayudar a los investigadores a diseñar terapias dirigidas a estas rutas. También es útil en estudios de farmacogenómica, donde el objetivo es comprender cómo las variaciones genéticas influyen en la respuesta a los medicamentos. Estos análisis proporcionan conocimientos que pueden guiar la investigación traslacional y la práctica clínica, mejorando la precisión y efectividad de las intervenciones médicas.
+
+### Otros métodos de visualización en clusterProfiler:
+
+dotplot: El dotplot muestra el enriquecimiento de términos en diferentes clusters de genes. Cada punto representa un término, donde el tamaño indica el nivel de significancia o la cantidad de genes asociados. Es útil para identificar patrones de enriquecimiento y comparar la relevancia de varios términos entre clusters.
+
+emapplot: El emapplot visualiza las relaciones entre los términos de enriquecimiento, mostrando cómo se conectan entre sí. Los nodos representan términos y las conexiones indican similitudes o superposiciones. Este gráfico es útil para entender la estructura de los términos en un contexto más amplio.
+
+Ahora consulta la página de ayuda para estas funciones y úsalas para graficar algunos de tus clusters.
+
+>>>>>>> Stashed changes
