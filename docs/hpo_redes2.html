@@ -601,10 +601,11 @@ Caution
 <h4 data-number="3.3.5.1" class="anchored" data-anchor-id="también-podemos-exportar-los-resultados-a-csv-o-visualizarlos-en-tablas."><span class="header-section-number">3.3.5.1</span> También podemos exportar los resultados a CSV o visualizarlos en tablas.</h4>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert results to data frame and export to CSV</span></span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv2</span>(<span class="fu">as.data.frame</span>(enrich_results), <span class="at">file =</span> <span class="st">"GO_Enrichment_Abnormal_Renal_Corpuscle.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="co"># View as a table in R</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">as.data.frame</span>(enrich_results))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="fu">file.path</span>(<span class="st">"C:"</span>,<span class="st">"Users"</span>, <span class="st">"Usuario_UMA"</span>, <span class="st">"Desktop"</span>)) <span class="co"># Change folder so we write everything to Desktop</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="fu">write.csv2</span>(<span class="fu">as.data.frame</span>(enrich_results), <span class="at">file =</span> <span class="st">"GO_Enrichment_Abnormal_Renal_Corpuscle.csv"</span>, <span class="at">row.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="co"># View as a table in R</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">as.data.frame</span>(enrich_results))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>

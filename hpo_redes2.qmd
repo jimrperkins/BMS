@@ -380,6 +380,7 @@ barplot(enrich_results, showCategory = 10, title = "GO Enrichment Barplot")
 
 ```{r, eval=FALSE}
 # Convert results to data frame and export to CSV
+setwd(file.path("C:","Users", "Usuario_UMA", "Desktop")) # Change folder so we write everything to Desktop
 write.csv2(as.data.frame(enrich_results), file = "GO_Enrichment_Abnormal_Renal_Corpuscle.csv", row.names = FALSE)
 
 # View as a table in R
