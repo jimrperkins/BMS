@@ -312,7 +312,7 @@ clusterProfiler ofrece la función enrichGO para realizar el análisis de enriqu
 ```{r, eval=FALSE}
 BiocManager::install("GenomeInfoDb")
 BiocManager::install("clusterProfiler", ask = FALSE, update = FALSE, type = "binary")
-if (!requireNamespace("org.Hs.eg.db", quietly = TRUE)) BiocManager::install("org.Hs.eg.db")
+BiocManager::install("org.Hs.eg.db", ask = FALSE, update = FALSE, type = "binary")
 
 library(clusterProfiler)
 library(org.Hs.eg.db) # Base de datos de genes humanos
