@@ -99,7 +99,6 @@ Para ilustrar estos conceptos, utilizaremos la función \``sample_islands` de ig
 
 ```{r, eval=FALSE}
 # Load required packages
-if (!requireNamespace("igraph", quietly = TRUE)) install.packages("igraph")
 library(igraph)
 # Create a network to illustrate important principles
 g <- sample_islands(3, 30, 0.9, 10)
@@ -159,7 +158,7 @@ g_ba <- sample_pa(100, power = 1.9, directed = FALSE)
 plot(g_ba, vertex.size=5, vertex.label=NA, edge.arrow.size=0.2, main="Barabasi–Albert network")
 ```
 
-###  Distintos algoritmos para clusterizar una red
+### Distintos algoritmos para clusterizar una red
 
 1.  Algoritmo de Louvain
 
@@ -229,7 +228,7 @@ Una modularidad alta indica que los nodos dentro de un cluster están muy interc
 El uso de set.seed() permite que los resultados de procesos aleatorios sean reproducibles. En el análisis de redes, donde a menudo se utilizan grafos aleatorios o algoritmos estocásticos, fijar una semilla garantiza que la misma red o resultado se obtenga en cada ejecución del código. Esto es especialmente útil cuando se documentan los resultados o cuando se quiere comparar entre diferentes configuraciones o pruebas. En situaciones de enseñanza o investigación, permite que todos los involucrados trabajen con la misma estructura de red, facilitando la comprensión y el análisis.
 ```
 
-###Aplicando algoritmos a nuestra red
+### Aplicando algoritmos a nuestra red
 
 Crea un nuevo bloque en tus documentos Rmd y escribe el código para aplicar los tres algoritmos de agrupamiento a la red de interacción que creamos al inicio de esta práctica. Es posible que necesites consultar tus notas de la [práctica anterior](hpo_redes1.html) para crear un objeto igraph a partir de un data.frame.
 
@@ -311,7 +310,8 @@ Vamos a realizar un análisis ORA usando el paquete clusterProfiler en R. Para i
 clusterProfiler ofrece la función enrichGO para realizar el análisis de enriquecimiento basado en términos de GO. Vamos a ejecutarlo sobre nuestros genes de interés.
 
 ```{r, eval=FALSE}
-if (!requireNamespace("clusterProfiler", quietly = TRUE)) BiocManager::install("clusterProfiler")
+BiocManager::install("GenomeInfoDb")
+BiocManager::install("clusterProfiler", ask = FALSE, update = FALSE, type = "binary")
 if (!requireNamespace("org.Hs.eg.db", quietly = TRUE)) BiocManager::install("org.Hs.eg.db")
 
 library(clusterProfiler)

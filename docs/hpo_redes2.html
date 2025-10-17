@@ -201,6 +201,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#qué-es-el-clustering" id="toc-qué-es-el-clustering" class="nav-link" data-scroll-target="#qué-es-el-clustering"><span class="header-section-number">3.2.1</span> ¿Qué es el clustering?</a></li>
   <li><a href="#teoría-detrás-del-clustering" id="toc-teoría-detrás-del-clustering" class="nav-link" data-scroll-target="#teoría-detrás-del-clustering"><span class="header-section-number">3.2.2</span> Teoría Detrás del Clustering</a></li>
   <li><a href="#distintos-algoritmos-para-clusterizar-una-red" id="toc-distintos-algoritmos-para-clusterizar-una-red" class="nav-link" data-scroll-target="#distintos-algoritmos-para-clusterizar-una-red"><span class="header-section-number">3.2.3</span> Distintos algoritmos para clusterizar una red</a></li>
+  <li><a href="#aplicando-algoritmos-a-nuestra-red" id="toc-aplicando-algoritmos-a-nuestra-red" class="nav-link" data-scroll-target="#aplicando-algoritmos-a-nuestra-red"><span class="header-section-number">3.2.4</span> Aplicando algoritmos a nuestra red</a></li>
   </ul></li>
   <li><a href="#functional-enrichment" id="toc-functional-enrichment" class="nav-link" data-scroll-target="#functional-enrichment"><span class="header-section-number">3.3</span> Functional Enrichment</a>
   <ul class="collapse">
@@ -320,13 +321,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Para ilustrar estos conceptos, utilizaremos la función `<code>sample_islands</code> de igraph para crear un grafo sintético compuesto por “islas” o clústeres densamente conectados y parcialmente aislados. Este tipo de red es ideal para demostrar varios principios importantes de la teoría de grafos y el análisis de redes, incluyendo centralidad, modularidad, densidad y conectividad. A continuación, se explica cómo se relaciona con cada uno de estos principios:</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load required packages</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">"igraph"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) <span class="fu">install.packages</span>(<span class="st">"igraph"</span>)</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a network to illustrate important principles</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">sample_islands</span>(<span class="dv">3</span>, <span class="dv">30</span>, <span class="fl">0.9</span>, <span class="dv">10</span>)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize the graph</span></span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Red de islas para mostrar propiedades relacionadas con el clustering"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a network to illustrate important principles</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">sample_islands</span>(<span class="dv">3</span>, <span class="dv">30</span>, <span class="fl">0.9</span>, <span class="dv">10</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Visualize the graph</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(g, <span class="at">vertex.size=</span><span class="dv">5</span>, <span class="at">vertex.label=</span><span class="cn">NA</span>, <span class="at">edge.arrow.size=</span><span class="fl">0.2</span>, <span class="at">main=</span><span class="st">"Red de islas para mostrar propiedades relacionadas con el clustering"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="cómo-la-red-de-sample_islands-demuestra-estos-principios" class="level4" data-number="3.2.2.3">
@@ -433,7 +433,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>Una modularidad alta indica que los nodos dentro de un cluster están muy interconectados, y hay pocas conexiones con nodos fuera del cluster. Esto sugiere que el cluster representa un grupo funcional cohesivo. Por el contrario, una modularidad baja sugiere que los clusters no están bien definidos, con muchas conexiones externas, lo que dificulta la interpretación biológica. Los clusters con alta modularidad suelen corresponder a módulos funcionales claros, mientras que una baja modularidad puede reflejar procesos difusos o redes ruidosas.</code></pre>
 <p><em>¿Qué ventajas ofrece set.seed() cuando se trabaja con redes aleatorias o algoritmos estocásticos en el análisis de redes, y en qué situaciones sería más útil?</em></p>
 <pre><code>El uso de set.seed() permite que los resultados de procesos aleatorios sean reproducibles. En el análisis de redes, donde a menudo se utilizan grafos aleatorios o algoritmos estocásticos, fijar una semilla garantiza que la misma red o resultado se obtenga en cada ejecución del código. Esto es especialmente útil cuando se documentan los resultados o cuando se quiere comparar entre diferentes configuraciones o pruebas. En situaciones de enseñanza o investigación, permite que todos los involucrados trabajen con la misma estructura de red, facilitando la comprensión y el análisis.</code></pre>
-<p>###Aplicando algoritmos a nuestra red</p>
+</section>
+</section>
+<section id="aplicando-algoritmos-a-nuestra-red" class="level3" data-number="3.2.4">
+<h3 data-number="3.2.4" class="anchored" data-anchor-id="aplicando-algoritmos-a-nuestra-red"><span class="header-section-number">3.2.4</span> Aplicando algoritmos a nuestra red</h3>
 <p>Crea un nuevo bloque en tus documentos Rmd y escribe el código para aplicar los tres algoritmos de agrupamiento a la red de interacción que creamos al inicio de esta práctica. Es posible que necesites consultar tus notas de la <a href="hpo_redes1.html">práctica anterior</a> para crear un objeto igraph a partir de un data.frame.</p>
 <div class="callout callout-style-default callout-caution callout-titled">
 <div class="callout-header d-flex align-content-center collapsed" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
@@ -465,7 +468,6 @@ Caution
 </div>
 </div>
 </div>
-</section>
 </section>
 </section>
 <section id="functional-enrichment" class="level2" data-number="3.3">
@@ -518,25 +520,26 @@ Caution
 <p>Vamos a realizar un análisis ORA usando el paquete clusterProfiler en R. Para ilustrar el procedimiento, consideraremos genes asociados con el término del Human Phenotype Ontology (HPO) “Morfología Anormal del Corpúsculo Renal” (abnormal renal corpuscle morphology). Este análisis identificará procesos o rutas biológicas que están sobrerrepresentados en este grupo de genes.</p>
 <p>clusterProfiler ofrece la función enrichGO para realizar el análisis de enriquecimiento basado en términos de GO. Vamos a ejecutarlo sobre nuestros genes de interés.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">"clusterProfiler"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"clusterProfiler"</span>)</span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">"org.Hs.eg.db"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"org.Hs.eg.db"</span>)</span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(clusterProfiler)</span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(org.Hs.eg.db) <span class="co"># Base de datos de genes humanos</span></span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute ORA enrichment analysis</span></span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>enrich_results <span class="ot">&lt;-</span> <span class="fu">enrichGO</span>(</span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">gene          =</span> genes<span class="sc">$</span>name,      <span class="co"># Set of genes of interest (from HPO in this case)</span></span>
-<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">OrgDb         =</span> org.Hs.eg.db,        <span class="co"># Gene annotation database</span></span>
-<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">keyType       =</span> <span class="st">"SYMBOL"</span>,            <span class="co"># Type of gene identification (here, gene symbols)</span></span>
-<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">ont           =</span> <span class="st">"BP"</span>,                <span class="co"># Ontology (BP: biological processes)</span></span>
-<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">pAdjustMethod =</span> <span class="st">"BH"</span>,                <span class="co"># Method for p-value adjustment</span></span>
-<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">pvalueCutoff  =</span> <span class="fl">0.05</span>,                <span class="co"># Significance threshold for p-value</span></span>
-<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">qvalueCutoff  =</span> <span class="fl">0.2</span>                  <span class="co"># Significance threshold for q-value</span></span>
-<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostrar resultados</span></span>
-<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(enrich_results)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"GenomeInfoDb"</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"clusterProfiler"</span>, <span class="at">ask =</span> <span class="cn">FALSE</span>, <span class="at">update =</span> <span class="cn">FALSE</span>, <span class="at">type =</span> <span class="st">"binary"</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">"org.Hs.eg.db"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="st">"org.Hs.eg.db"</span>)</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(clusterProfiler)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(org.Hs.eg.db) <span class="co"># Base de datos de genes humanos</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Execute ORA enrichment analysis</span></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>enrich_results <span class="ot">&lt;-</span> <span class="fu">enrichGO</span>(</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">gene          =</span> genes<span class="sc">$</span>name,      <span class="co"># Set of genes of interest (from HPO in this case)</span></span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">OrgDb         =</span> org.Hs.eg.db,        <span class="co"># Gene annotation database</span></span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">keyType       =</span> <span class="st">"SYMBOL"</span>,            <span class="co"># Type of gene identification (here, gene symbols)</span></span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">ont           =</span> <span class="st">"BP"</span>,                <span class="co"># Ontology (BP: biological processes)</span></span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">pAdjustMethod =</span> <span class="st">"BH"</span>,                <span class="co"># Method for p-value adjustment</span></span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">pvalueCutoff  =</span> <span class="fl">0.05</span>,                <span class="co"># Significance threshold for p-value</span></span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">qvalueCutoff  =</span> <span class="fl">0.2</span>                  <span class="co"># Significance threshold for q-value</span></span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Mostrar resultados</span></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(enrich_results)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="explicación-de-argumentos-clave-en-enrichgo" class="level3" data-number="3.3.4">
