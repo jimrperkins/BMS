@@ -92,7 +92,7 @@ El clustering en redes es el proceso de identificar grupos de nodos (genes, en e
   $$
   donde \\(P(i,j)\\) es el conjunto de todos los caminos entre \\(i\\) y \\(j\\), y \\(|\pi|\\) es la longitud del camino \\(\pi\\).
 
-  La red se dice conexa si \\(d(i,j) < \infty\\) para todo par de nodos \\(i,j\\).  
+  La red se dice conexa si $d(i,j) < \infty$ para todo par de nodos \\(i,j\\).  
   En grafos no conexos, el conjunto de nodos se divide en componentes conexas.
 
 3. Centralidad (Centrality): La centralidad mide la importancia de un nodo dentro de la red. Hay varias formas de calcular la centralidad:
