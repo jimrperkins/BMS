@@ -337,24 +337,24 @@ La longitud mínima entre dos nodos \(i\) y \(j\) es la distancia:</p></li>
 <p><span class="math display">\[
   d(i,j) = \min_{\pi \in P(i,j)} \, |\pi|,
   \]</span> donde \(P(i,j)\) es el conjunto de todos los caminos entre \(i\) y \(j\), y \(||\) es la longitud del camino \(\).</p>
-<p>La red se dice conexa si \(d(i,j) &lt; \) para todo par de nodos \(i,j\).<br>
+<p>La red se dice conexa si <span class="math inline">\(d(i,j) &lt; \infty\)</span> para todo par de nodos \(i,j\).<br>
 En grafos no conexos, el conjunto de nodos se divide en componentes conexas.</p>
 <ol start="3" type="1">
 <li>Centralidad (Centrality): La centralidad mide la importancia de un nodo dentro de la red. Hay varias formas de calcular la centralidad:</li>
 </ol>
 <ul>
 <li><p>Centralidad de Grado (Degree Centrality): Número de conexiones que tiene un nodo. Un alto grado puede indicar un nodo clave en la red.<br>
-Para un nodo \(v\) en un grafo simple no dirigido:</p>
+Para un nodo <span class="math inline">\(v\)</span> en un grafo simple no dirigido:</p>
 <p><span class="math display">\[
 k(v) = \sum_{u \in V} a_{vu},
 \]</span></p>
-<p>donde \(a_{vu}\) es la entrada de la matriz de adyacencia (\(a_{vu} = 1\) si hay arista \(vu\), y 0 si no).</p></li>
+<p>donde <span class="math inline">\(a_{vu}\)</span> es la entrada de la matriz de adyacencia (<span class="math inline">\(a_{vu} = 1\)</span> si hay arista <span class="math inline">\(v\text{--}u\)</span>, y 0 si no).</p></li>
 </ul>
 <hr>
 <ul>
 <li><p>Centralidad de Intermediación (Betweenness Centrality): Indica cuántas veces un nodo actúa como un puente a lo largo de los caminos más cortos entre otros nodos.</p>
-<p>Sea \(<em>{st}\) el número de caminos más cortos entre \(s\) y \(t\),<br>
-y \(</em>{st}(v)\) cuántos pasan por \(v\):</p>
+<p>Sea <span class="math inline">\(\sigma_{st}\)</span> el número de caminos más cortos entre <span class="math inline">\(s\)</span> y <span class="math inline">\(t\)</span>,<br>
+y <span class="math inline">\(\sigma_{st}(v)\)</span> cuántos pasan por <span class="math inline">\(v\)</span>:</p>
 <p><span class="math display">\[
 C_B(v) = \sum_{\substack{s \neq v \neq t \\ s \neq t}}
 \frac{\sigma_{st}(v)}{\sigma_{st}}.
@@ -363,7 +363,7 @@ C_B(v) = \sum_{\substack{s \neq v \neq t \\ s \neq t}}
 <hr>
 <ul>
 <li><p>Centralidad de Cercanía (Closeness Centrality): Mide qué tan cerca está un nodo de todos los demás nodos en la red, lo que puede reflejar su capacidad para acceder rápidamente a información.</p>
-<p>Con \(d(v,t)\) la distancia más corta entre \(v\) y \(t\):</p>
+<p>Con <span class="math inline">\(d(v,t)\)</span> la distancia más corta entre <span class="math inline">\(v\)</span> y <span class="math inline">\(t\)</span>:</p>
 <p><span class="math display">\[
 C_C(v) = \frac{n-1}{\sum_{t \neq v} d(v,t)}.
 \]</span></p>
@@ -371,7 +371,7 @@ C_C(v) = \frac{n-1}{\sum_{t \neq v} d(v,t)}.
 <p><span class="math display">\[
 C_H(v) = \sum_{t \neq v} \frac{1}{d(v,t)},
 \]</span></p>
-<p>con la convención \(1/= 0\).</p></li>
+<p>con la convención <span class="math inline">\(1/\infty = 0\)</span>.</p></li>
 </ul>
 <ol start="4" type="1">
 <li><p>Densidad (Network Density): Se refiere a la proporción de conexiones existentes en la red en comparación con el número máximo posible de conexiones. Una red densa puede indicar una alta interconexión entre nodos, lo cual es fundamental para la identificación de clusters.</p></li>
