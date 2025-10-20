@@ -99,21 +99,21 @@ El clustering en redes es el proceso de identificar grupos de nodos (genes, en e
 
 - Centralidad de Grado (Degree Centrality):
   Número de conexiones que tiene un nodo. Un alto grado puede indicar un nodo clave en la red.  
-  Para un nodo \\(v\\) en un grafo simple no dirigido:
+  Para un nodo $v$ en un grafo simple no dirigido:
 
   $$
   k(v) = \sum_{u \in V} a_{vu},
   $$
 
-  donde \\(a_{vu}\\) es la entrada de la matriz de adyacencia (\\(a_{vu} = 1\\) si hay arista \\(v\text{--}u\\), y 0 si no).
+  donde $a_{vu}$ es la entrada de la matriz de adyacencia ($a_{vu} = 1$ si hay arista $v\text{--}u$, y 0 si no).
 
 ---
 
 - Centralidad de Intermediación (Betweenness Centrality):
   Indica cuántas veces un nodo actúa como un puente a lo largo de los caminos más cortos entre otros nodos.  
 
-  Sea \\(\sigma_{st}\\) el número de caminos más cortos entre \\(s\\) y \\(t\\),  
-  y \\(\sigma_{st}(v)\\) cuántos pasan por \\(v\\):
+  Sea $\sigma_{st}$ el número de caminos más cortos entre $s$ y $t$,  
+  y $\sigma_{st}(v)$ cuántos pasan por $v$:
 
   $$
   C_B(v) = \sum_{\substack{s \neq v \neq t \\ s \neq t}} 
@@ -125,7 +125,7 @@ El clustering en redes es el proceso de identificar grupos de nodos (genes, en e
 - Centralidad de Cercanía (Closeness Centrality): 
   Mide qué tan cerca está un nodo de todos los demás nodos en la red, lo que puede reflejar su capacidad para acceder rápidamente a información.  
 
-  Con \\(d(v,t)\\) la distancia más corta entre \\(v\\) y \\(t\\):
+  Con $d(v,t)$ la distancia más corta entre $v$ y $t$:
 
   $$
   C_C(v) = \frac{n-1}{\sum_{t \neq v} d(v,t)}.
@@ -137,7 +137,7 @@ El clustering en redes es el proceso de identificar grupos de nodos (genes, en e
   C_H(v) = \sum_{t \neq v} \frac{1}{d(v,t)},
   $$
 
-  con la convención \\(1/\infty = 0\\).
+  con la convención $1/\infty = 0$.
 
 4.  Densidad (Network Density): Se refiere a la proporción de conexiones existentes en la red en comparación con el número máximo posible de conexiones. Una red densa puede indicar una alta interconexión entre nodos, lo cual es fundamental para la identificación de clusters.
 
