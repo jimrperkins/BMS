@@ -2,6 +2,20 @@
 
 En este práctico, nos enfocaremos en regenerar la red de interacción genética de la semana pasada utilizando STRINGdb. Luego, aplicaremos algoritmos de clustering para identificar grupos de genes altamente conectados. Posteriormente, realizaremos un análisis de sobre-representación utilizando clusterProfiler para interpretar los posibles roles biológicos de estas comunidades. Finalmente, visualizaremos los resultados de enriquecimiento de manera clara y efectiva. Usaremos los genes asociados al fenotipo de morfología anormal del corpúsculo renal que obtuvimos en la práctica anterior.
 
+## Parte 0: Preparar entorno de trabajo
+
+En primer lugar, abriremos la máquina virtual desde el campus virtual. Seleccionaremos la máquina virtual con el *software* genérico. 
+
+Una vez hecho esto, abriremos RStudio dentro de la máquina virtual (donde trabajaremos para que los resultados sean reproducibles) y, en la terminal ejecutaremos las siguientes dos líneas.
+
+```{r,  eval=FALSE}
+# Load required packages
+Sys.setenv(CURL_SSL_BACKEND = "openssl") # Necessary step to reinstall curl for use in Windows
+install.packages("curl", force=TRUE, dependencies = TRUE)
+```
+
+Una vez ejecutadas estas dos línas, pasamos a abrir un documento de tipo *R Markdown*. Para ello, simplemente hay que ir a *File* $>$ *New File* $>$ *R Markdown*. **Importante, nos pedirá descargar algunos paquetes, tenéis que darle el "ok".** Una vez descargados los paquetes que solicitaba el tipo de archivo, seleccionamos la configuración por defecto y obtendremos una plantilla de ejemplo. Como veremos, la comodidad de este tipo de archivos *R Markdown* reside en la capacidad de combinar texto libre con bloques de código que podemos ejecutar en cualquier momento. Para iniciar un bloque de código, puede hacerse con los comandos "Ctrl + Alt + i".
+
 ## Parte 1: Regenerando la Red de Interacción (Recordatorio)
 
 En esta sección, recordaremos cómo construir una red de interacción utilizando STRINGdb y convertirla a un formato que podamos usar con la librería igraph en R.
@@ -12,9 +26,6 @@ STRINGdb es una base de datos que proporciona información sobre interacciones e
 
 ```{r, eval=FALSE}
 # Load required packages
-Sys.setenv(CURL_SSL_BACKEND = "openssl") # Necessary step to reinstall curl for use in Windows
-install.packages("curl", force=TRUE, dependencies = TRUE)
-
 if (!requireNamespace("httr", quietly = TRUE)) install.packages("httr")
 if (!requireNamespace("jsonlite", quietly = TRUE)) install.packages("jsonlite")
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
@@ -391,7 +402,7 @@ hist(sizes(cluster_infomap),
      xlab = "Tamaño de comunidad (nodos)", ylab = "Frecuencia")
 ```
 
-## Functional Enrichment
+## Parte 3: Enriquecimiento Funcional (*Functional Enrichment*).
 
 ### Introducción al Análisis de Enriquecimiento Funcional
 
