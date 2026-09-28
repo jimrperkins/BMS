@@ -6,13 +6,13 @@ Bienvenidos a la Reintroducción a R. En esta sesión de una hora, aprendereis y
 
 Al final de este tutorial, podrás:
 
--   Entender la sintaxis básica y la estructura de R.
+- Entender la sintaxis básica y la estructura de R.
 
--   Realizar operaciones simples con datos.
+- Realizar operaciones simples con datos.
 
--   Crear gráficos básicos relevantes para la biología y la bioinformática.
+- Crear gráficos básicos relevantes para la biología y la bioinformática.
 
--   Entender los conceptos básicos del análisis de redes con `igraph`.
+- Entender los conceptos básicos del análisis de redes con `igraph`.
 
 ## Comenzando
 
@@ -306,12 +306,11 @@ plot(graph_example, layout = layout, vertex.size = 20, vertex.label = NA, vertex
 layout <- layout_in_circle(graph_example)
 plot(graph_example, layout = layout, vertex.size = 20, vertex.label = NA, vertex.color = "skyblue", edge.arrow.size = 0.5, edge.color = "gray")
 ```
+
 ```{r}
 layout <- layout_with_fr(graph_example)
 plot(graph_example, layout = layout, vertex.size = degree(graph_example), vertex.label = NA, vertex.color = "skyblue", edge.arrow.size = 0.5, edge.color = "gray")
 ```
-
-
 
 ## Conclusión
 
