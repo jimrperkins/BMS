@@ -31,6 +31,34 @@ Los **paquetes** son colecciones de funciones que amplían las capacidades de R.
 
 Comprender estos conceptos te ayudará a navegar por R y aplicar herramientas para el análisis de datos en biología molecular.
 
+## Parte 0: Preparamos el Terreno
+
+### Instalar paquetes necesarios
+```{r, eval=FALSE}
+# Install necessary packages if not already installed
+Sys.setenv(CURL_SSL_BACKEND = "openssl") # Necessary step to reinstall curl for use in Windows
+install.packages("curl", force=TRUE, dependencies = TRUE)
+
+if (!requireNamespace("httr", quietly = TRUE)) {
+  install.packages("httr")
+}
+if (!requireNamespace("jsonlite", quietly = TRUE)) {
+  install.packages("jsonlite")
+}
+if (!requireNamespace("BiocManager", quietly = TRUE)) {
+  install.packages("BiocManager")
+}
+# Install the STRINGdb package if not already installed
+if (!requireNamespace("STRINGdb", quietly = TRUE)) {
+  BiocManager::install("STRINGdb", ask = FALSE, update = FALSE, type = "binary")
+}
+# Install igraph if it's not already installed
+if (!requireNamespace("igraph", quietly = TRUE)) {
+  install.packages("igraph")
+}
+```
+
+
 ## Parte 1: Descargar la Lista de Genes de la HPO
 
 ### Descarga Manual
@@ -51,17 +79,6 @@ Una **Interfaz de Programación de Aplicaciones (API)** permite que diferentes a
 Para usar la API, aquí hay un ejemplo de cómo obtener genes programáticamente. Primero, necesitamos instalar y cargar las bibliotecas necesarias:
 
 ```{r, eval=FALSE}
-# Install necessary packages if not already installed
-Sys.setenv(CURL_SSL_BACKEND = "openssl") # Necessary step to reinstall curl for use in Windows
-install.packages("curl", force=TRUE, dependencies = TRUE)
-
-if (!requireNamespace("httr", quietly = TRUE)) {
-  install.packages("httr")
-}
-if (!requireNamespace("jsonlite", quietly = TRUE)) {
-  install.packages("jsonlite")
-}
-
 library(httr)
 library(jsonlite)
 
@@ -128,14 +145,6 @@ A través de la API de STRING, podemos obtener de manera programática una red d
 A continuación, aseguramos de que tienes el paquete STRINGdb instalado y luego procederemos a obtener la red de interacción.
 
 ```{R, eval=FALSE}
-if (!requireNamespace("BiocManager", quietly = TRUE)) {
-  install.packages("BiocManager")
-}
-# Install the STRINGdb package if not already installed
-if (!requireNamespace("STRINGdb", quietly = TRUE)) {
-  BiocManager::install("STRINGdb", ask = FALSE, update = FALSE, type = "binary")
-}
-
 library(STRINGdb)
 
 # Initialize STRINGdb with the appropriate version and species
@@ -192,11 +201,6 @@ En esta sección, convertiremos la red de interacción obtenida de STRINGdb al f
 Primero, asegúrate de tener instalado y cargado el paquete igraph:
 
 ```{r, eval=FALSE}
-# Install igraph if it's not already installed
-if (!requireNamespace("igraph", quietly = TRUE)) {
-  install.packages("igraph")
-}
-
 library(igraph)
 ```
 
