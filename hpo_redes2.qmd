@@ -43,7 +43,7 @@ library(STRINGdb)
 hpo_id <- "HP:0031263"  # HPO ID for abnormal renal corpuscle morphology
 url <- paste0("https://ontology.jax.org/api/network/annotation/", hpo_id)
 response <- GET(url)
-data <- content(response, as = "text", encoding = "UTF-8")
+data <- httr::content(response, as = "text", encoding = "UTF-8")
 genes <- fromJSON(data)$genes
 
 # Initialize STRINGdb
